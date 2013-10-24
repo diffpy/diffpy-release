@@ -1,0 +1,22 @@
+(1) Install the required Ubuntu Packages with:
+
+    sudo apt-get install \
+        libgsl0ldbl \
+        libboost-all-dev \
+        python-setuptools \
+        python-wxtools \
+        python-numpy \
+        python-scipty \
+        python-matplotlib \
+        ipython \
+
+
+(2) Create a symbolic link to the diffpy-u12x64.pth file in
+    /usr/local/lib/python2.7/dist-packages using:
+
+    sudo ln -si $PWD/diffpy-u12x64.pth /usr/local/lib/python2.7/dist-packages/
+
+
+(3) Test the installation with
+
+    ./runtests.sh
