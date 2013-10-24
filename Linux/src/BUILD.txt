@@ -1,0 +1,19 @@
+Installation Order
+
+PyCifRW-3.1.4p01.tar.gz
+diffpy.Structure
+diffpy.pdffit2
+diffpy.utils
+diffpy.pdfgui
+
+cctbx
+pyobjcryst/libobjcryst
+pyobjcryst
+libdiffpy
+diffpy.srreal
+
+data_util
+DataLoader
+sansmodels
+pr_inversion
+diffpy.srfit
