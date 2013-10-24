@@ -22,3 +22,6 @@
 [submodule "common/src/pycifrw"]
 	path = common/src/pycifrw
 	url = ./common/src/pycifrw
+[submodule "common/src/cxxtest"]
+	path = common/src/cxxtest
+	url = https://github.com/CxxTest/cxxtest.git
