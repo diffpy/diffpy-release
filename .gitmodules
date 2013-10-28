@@ -1,24 +1,24 @@
 [submodule "Linux/src/diffpy.srfit"]
-	path = common/src/diffpy.srfit
+	path = Linux/src/diffpy.srfit
 	url = https://github.com/diffpy/diffpy.srfit.git
-[submodule "common/src/diffpy.srreal"]
-	path = common/src/diffpy.srreal
+[submodule "Linux/src/diffpy.srreal"]
+	path = Linux/src/diffpy.srreal
 	url = https://github.com/diffpy/diffpy.srreal.git
-[submodule "common/src/libdiffpy"]
-	path = common/src/libdiffpy
+[submodule "Linux/src/libdiffpy"]
+	path = Linux/src/libdiffpy
 	url = https://github.com/diffpy/libdiffpy
-[submodule "common/src/diffpy.utils"]
-	path = common/src/diffpy.utils
+[submodule "Linux/src/diffpy.utils"]
+	path = Linux/src/diffpy.utils
 	url = https://github.com/diffpy/diffpy.utils
-[submodule "common/src/diffpy.Structure"]
-	path = common/src/diffpy.Structure
+[submodule "Linux/src/diffpy.Structure"]
+	path = Linux/src/diffpy.Structure
 	url = https://github.com/diffpy/diffpy.Structure
-[submodule "common/src/pyobjcryst"]
-	path = common/src/pyobjcryst
+[submodule "Linux/src/pyobjcryst"]
+	path = Linux/src/pyobjcryst
 	url = https://github.com/diffpy/pyobjcryst
-[submodule "common/src/periodictable"]
-	path = common/src/periodictable
+[submodule "Linux/src/periodictable"]
+	path = Linux/src/periodictable
 	url = https://github.com/pkienzle/periodictable.git
-[submodule "common/src/cxxtest"]
-	path = common/src/cxxtest
+[submodule "Linux/src/cxxtest"]
+	path = Linux/src/cxxtest
 	url = https://github.com/CxxTest/cxxtest.git
