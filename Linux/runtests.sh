@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 # python -m diffpy.pdfgui.tests.rundeps
 python -m diffpy.Structure.tests.run
