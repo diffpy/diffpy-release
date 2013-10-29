@@ -97,35 +97,35 @@ fi
 cd $SRCDIR
 
 ListSkipOrBuild pycifrw || {
-easy_install -UZN --prefix=$PREFIX PyCifRW
+    easy_install -UZN --prefix=$PREFIX PyCifRW
 }
 
 ListSkipOrBuild diffpy.Structure || {
-easy_install -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.Structure
+    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.Structure
 }
 
 ListSkipOrBuild diffpy.utils || {
-easy_install -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.utils
+    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.utils
 }
 
 ListSkipOrBuild periodictable || {
-easy_install -UZN --prefix=$PREFIX ${SRCDIR}/periodictable
+    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/periodictable
 }
 
 ListSkipOrBuild cctbx || {
-mkdir -p ${SRCDIR}/cctbx/cctbx_build
-cctbx_configargs=(
-    --build-boost-python-extensions=False
-    --no-bin-python
-    mmtbx libtbx cctbx iotbx fftw3tbx rstbx spotfinder
-    smtbx mmtbx cbflib clipper
-)
-cd ${SRCDIR}/cctbx/cctbx_build
-$PYTHON ../cctbx_sources/libtbx/configure.py $cctbx_configargs
-make
-( source setpaths.sh &&
-  cd ../cctbx_sources/setup &&
-  ./unix_integrate_cctbx.sh --yes --prefix=$PREFIX all )
+    mkdir -p ${SRCDIR}/cctbx/cctbx_build
+    cctbx_configargs=(
+        --no-bin-python
+        mmtbx libtbx cctbx iotbx fftw3tbx rstbx spotfinder
+        smtbx mmtbx cbflib clipper
+    )
+    cd ${SRCDIR}/cctbx/cctbx_build
+    $PYTHON ../cctbx_sources/libtbx/configure.py $cctbx_configargs
+    ./bin/libtbx.scons -j $NCPU no_boost_python=yes
+    ( source setpaths.sh &&
+      cd ../cctbx_sources/setup &&
+      ./unix_integrate_cctbx.sh --yes --prefix=$PREFIX all
+    )
 }
 
 ListSkipOrBuild cxxtest || {
