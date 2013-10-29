@@ -1,3 +1,8 @@
+/Linux/bin/
+/Linux/include/
+/Linux/lib/
+/Linux/share/
+/Linux/src/cctbx/
 /Linux/src/cxxtest/
 /Linux/src/diffpy.Structure/
 /Linux/src/diffpy.srfit/
