@@ -48,8 +48,8 @@ svnrepos=(
         https://svn.code.sf.net/p/objcryst/code/trunk/ObjCryst
     sans/data_util
         svn://svn@danse.us/common/util
-    sans/DataLoader
-        svn://svn@danse.us/sans/trunk/DataLoader
+    sans/sansdataloader
+        svn://svn@danse.us/sans/trunk/sansdataloader
     sans/sansmodels
         svn://svn@danse.us/sans/trunk/sansmodels
     sans/pr_inversion
