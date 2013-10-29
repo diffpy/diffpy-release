@@ -35,11 +35,10 @@ gitrepos=(
 
 # URLs to source code bundles as (directory, URL)
 tarballs=(
-    .   https://bitbucket.org/jamesrhester/pycifrw/downloads/PyCifRW-3.6.1.tar.gz
     cctbx
         http://cci.lbl.gov/cctbx_build/results/2013_07_05_0005/cctbx_bundle.tar.gz
     pyobjcryst/libobjcryst/newmat
-        http://www.robertnz.net/ftp/newmat10.tar.gz
+        http://www.robertnz.net/ftp/newmat11.tar.gz
 )
 
 # Subversion repositories as (targetpath, URL)
@@ -90,20 +89,14 @@ fetchtarball() {
 
     
 # Download all required sources
-for t u b in $gitrepos; do
-    fetchgitrepository $t $u $b
-done
+for t u b in $gitrepos;  fetchgitrepository $t $u $b
+for t u in $svnrepos;  fetchsvnrepository $t $u
+for t u in $tarballs;  fetchtarball $t $u
 
-for t u in $svnrepos; do
-    fetchsvnrepository $t $u
-done
+# extract tarballs
 
-for t u in $tarballs; do
-    fetchtarball $t $u
-done
-
-# postprocessing
 cctbxbundle=${MYDIR}/cctbx/cctbx_bundle.tar.gz
 tar xzf $cctbxbundle -C ${cctbxbundle:h}
-newmatbundle=${MYDIR}/pyobjcryst/libobjcryst/newmat/newmat10.tar.gz
+
+newmatbundle=${MYDIR}/pyobjcryst/libobjcryst/newmat/newmat11.tar.gz
 tar xzf $newmatbundle -C ${newmatbundle:h}
