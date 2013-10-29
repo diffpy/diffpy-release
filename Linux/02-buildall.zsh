@@ -59,6 +59,7 @@ INCLUDEDIR=${PREFIX}/include
 LIBDIR=${PREFIX}/lib
 PYTHON_VERSION=$($PYTHON -c 'import sys; print "%s.%s" % sys.version_info[:2]')
 PYTHONDIR=$LIBDIR/python${PYTHON_VERSION}/site-packages
+RELPATH=${MYDIR}/buildtools/relpath
 
 # Adjust environment variables used in the build -----------------------------
 
@@ -173,5 +174,19 @@ ListSkipOrBuild diffpy.srfit || {
     easy_install -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
 }
 
-# use patchelf to fix the RPATH in shared library objects 
-# FIXME...
+ListSkipOrBuild patch_so_rpath || {
+    libsofiles=( $LIBDIR/*.so(*) )
+    pyextfiles=(
+        ${SRCDIR}/cctbx/cctbx_build/lib/*_ext.so(*)
+        ${LIBDIR}/python*/site-packages/**/*.so(*)
+    )
+    typeset -aU depdirs
+    for f in $libsofiles $pyextfiles; do
+        sodeps=( $(ldd $f | grep ${(F)libsofiles} | awk '$2 == "=>" {print $3}') )
+        [[ ${#sodeps} != 0 ]] || continue
+        depdirs=( $($RELPATH ${sodeps:h} ${f:h} ) )
+        depdirs=( ${${(M)depdirs:#.}/*/'$ORIGIN'} '$ORIGIN'/${^${depdirs:#.}} )
+        print "patchelf --set-rpath ${(j,:,)depdirs} $f"
+        patchelf --set-rpath ${(j,:,)depdirs} $f
+    done
+}
