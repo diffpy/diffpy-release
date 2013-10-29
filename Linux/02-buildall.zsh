@@ -90,8 +90,8 @@ print "\
 easy_install -UZN --prefix=$PREFIX ${SRCDIR}/sans/data_util
 
 print "\
-# sans/DataLoader ------------------------------------------------------------"
-easy_install -UZN --prefix=$PREFIX ${SRCDIR}/sans/DataLoader
+# sans/sansdataloader --------------------------------------------------------"
+easy_install -UZN --prefix=$PREFIX ${SRCDIR}/sans/sansdataloader
 
 print "\
 # sans/sansmodels ------------------------------------------------------------"
