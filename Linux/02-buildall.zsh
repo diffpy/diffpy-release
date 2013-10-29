@@ -155,19 +155,23 @@ ListSkipOrBuild diffpy.srreal || {
 }
 
 ListSkipOrBuild sans/data_util || {
-    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/sans/data_util
+    cd ${SRCDIR}/sans/data_util
+    ${PYTHON} setup.py install --prefix=$PREFIX
 }
 
 ListSkipOrBuild sans/sansdataloader || {
-    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/sans/sansdataloader
+    cd ${SRCDIR}/sans/sansdataloader
+    ${PYTHON} setup.py install --prefix=$PREFIX
 }
 
 ListSkipOrBuild sans/sansmodels || {
-    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/sans/sansmodels
+    cd ${SRCDIR}/sans/sansmodels
+    ${PYTHON} setup.py install --prefix=$PREFIX
 }
 
 ListSkipOrBuild sans/pr_inversion || {
-    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/sans/pr_inversion
+    cd ${SRCDIR}/sans/pr_inversion
+    ${PYTHON} setup.py install --prefix=$PREFIX
 }
 
 ListSkipOrBuild diffpy.srfit || {
