@@ -3,6 +3,7 @@
 setopt err_exit
 
 MYDIR=${0:A:h}
+SRCDIR=${MYDIR}/src
 
 # git repositories for the sources in order of
 # (project, URL, branch)
@@ -59,7 +60,7 @@ svnrepos=(
 fetchgitrepository() {
     [[ $# == 3 ]] || exit $?
     local tgtdir=$1 url=$2 branch=$3
-    cd $MYDIR
+    cd $SRCDIR
     if [[ ! -d $tgtdir ]]; then
         git clone -b $branch $url $tgtdir
     else
@@ -71,13 +72,13 @@ fetchgitrepository() {
 fetchsvnrepository() {
     [[ $# == 2 ]] || exit $?
     local tgtdir=$1 url=$2
-    cd $MYDIR
+    cd $SRCDIR
     svn checkout $url $tgtdir
 }
 
 
 fetchtarball() {
-    cd $MYDIR
+    cd $SRCDIR
     [[ $# == 2 ]] || exit $?
     local tgtdir=$1 url=$2
     if [[ -f ${tgtdir}/${url:t} ]]; then
@@ -95,8 +96,8 @@ for t u in $tarballs;  fetchtarball $t $u
 
 # extract tarballs
 
-cctbxbundle=${MYDIR}/cctbx/cctbx_bundle.tar.gz
+cctbxbundle=${SRCDIR}/cctbx/cctbx_bundle.tar.gz
 tar xzf $cctbxbundle -C ${cctbxbundle:h}
 
-newmatbundle=${MYDIR}/pyobjcryst/libobjcryst/newmat/newmat11.tar.gz
+newmatbundle=${SRCDIR}/pyobjcryst/libobjcryst/newmat/newmat11.tar.gz
 tar xzf $newmatbundle -C ${newmatbundle:h}
