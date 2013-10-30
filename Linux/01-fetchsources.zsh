@@ -2,7 +2,7 @@
 
 setopt err_exit
 
-MYDIR=${"$(readlink -f $0)":h}
+MYDIR="$(cd ${0:h} && pwd)"
 SRCDIR=${MYDIR}/src
 
 # git repositories for the sources in order of
