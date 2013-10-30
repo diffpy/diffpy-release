@@ -60,11 +60,10 @@ svnrepos=(
 fetchgitrepository() {
     [[ $# == 3 ]] || exit $?
     local tgtdir=$1 url=$2 branch=$3
-    cd $SRCDIR
     if [[ ! -d $tgtdir ]]; then
         git clone -b $branch $url $tgtdir
     else
-        cd $tgtdir && git pull origin $branch
+        ( cd $tgtdir && git pull origin $branch )
     fi
 }
 
@@ -72,24 +71,23 @@ fetchgitrepository() {
 fetchsvnrepository() {
     [[ $# == 2 ]] || exit $?
     local tgtdir=$1 url=$2
-    cd $SRCDIR
     svn checkout $url $tgtdir
 }
 
 
 fetchtarball() {
-    cd $SRCDIR
     [[ $# == 2 ]] || exit $?
     local tgtdir=$1 url=$2
     if [[ -f ${tgtdir}/${url:t} ]]; then
         return
     fi
     mkdir -p $tgtdir
-    cd $tgtdir && curl -O $url
+    ( cd $tgtdir && curl -O $url )
 }
 
 
 # Download all required sources
+cd $SRCDIR
 for t u b in $gitrepos;  fetchgitrepository $t $u $b
 for t u in $svnrepos;  fetchsvnrepository $t $u
 for t u in $tarballs;  fetchtarball $t $u
