@@ -26,7 +26,7 @@ Environment variables can be used to override script defaults:
   NCPU          number of CPUs used in parallel builds [all-cores].
 "
 DOC=${${DOC##[[:space:]]##}%%[[:space:]]##}
-MYDIR=${0:A:h}
+MYDIR=${"$(readlink -f $0)":h}
 
 # Parse Options --------------------------------------------------------------
 
