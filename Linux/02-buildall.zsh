@@ -98,7 +98,8 @@ fi
 cd $SRCDIR
 
 ListSkipOrBuild pycifrw || {
-    $EASY_INSTALL -UZN --prefix=$PREFIX PyCifRW
+    $EASY_INSTALL -UZN --prefix=$PREFIX \
+        https://bitbucket.org/jamesrhester/pycifrw/downloads/PyCifRW-3.6.1.tar.gz
 }
 
 ListSkipOrBuild diffpy.Structure || {
