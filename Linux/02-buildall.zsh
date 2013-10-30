@@ -98,19 +98,19 @@ fi
 cd $SRCDIR
 
 ListSkipOrBuild pycifrw || {
-    easy_install -UZN --prefix=$PREFIX PyCifRW
+    $EASY_INSTALL -UZN --prefix=$PREFIX PyCifRW
 }
 
 ListSkipOrBuild diffpy.Structure || {
-    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.Structure
+    $EASY_INSTALL -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.Structure
 }
 
 ListSkipOrBuild diffpy.utils || {
-    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.utils
+    $EASY_INSTALL -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.utils
 }
 
 ListSkipOrBuild periodictable || {
-    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/periodictable
+    $EASY_INSTALL -UZN --prefix=$PREFIX ${SRCDIR}/periodictable
 }
 
 ListSkipOrBuild cctbx || {
@@ -140,23 +140,23 @@ ListSkipOrBuild cxxtest || {
 
 ListSkipOrBuild libObjCryst || {
     cd $SRCDIR/pyobjcryst/libobjcryst
-    scons -j $NCPU build=fast with_shared_cctbx=yes prefix=$PREFIX install
+    $SCONS -j $NCPU build=fast with_shared_cctbx=yes prefix=$PREFIX install
 }
 
 ListSkipOrBuild pyobjcrst || {
     cd $SRCDIR/pyobjcryst
-    scons -j $NCPU build=fast prefix=$PREFIX install
+    $SCONS -j $NCPU build=fast prefix=$PREFIX install
 }
 
 ListSkipOrBuild libdiffpy || {
     cd $SRCDIR/libdiffpy
-    scons -j $NCPU build=fast enable_objcryst=yes test
-    scons -j $NCPU build=fast enable_objcryst=yes prefix=$PREFIX install
+    $SCONS -j $NCPU build=fast enable_objcryst=yes test
+    $SCONS -j $NCPU build=fast enable_objcryst=yes prefix=$PREFIX install
 }
 
 ListSkipOrBuild diffpy.srreal || {
     cd $SRCDIR/diffpy.srreal
-    scons -j $NCPU build=fast prefix=$PREFIX install
+    $SCONS -j $NCPU build=fast prefix=$PREFIX install
 }
 
 ListSkipOrBuild sans/data_util || {
@@ -180,7 +180,7 @@ ListSkipOrBuild sans/pr_inversion || {
 }
 
 ListSkipOrBuild diffpy.srfit || {
-    easy_install -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
+    $EASY_INSTALL -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
 }
 
 ListSkipOrBuild patch_so_rpath || {
