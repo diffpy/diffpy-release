@@ -91,7 +91,7 @@ ListSkipOrBuild() {
 
 # Build commands here --------------------------------------------------------
 
-if [[ -n ${opt_list} ]]; then
+if [[ -z ${opt_list} ]]; then
     mkdir -p $BINDIR $INCLUDEDIR $LIBDIR $PYTHONDIR
 fi
 
