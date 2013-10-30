@@ -122,7 +122,7 @@ ListSkipOrBuild cctbx || {
     )
     cd ${SRCDIR}/cctbx/cctbx_build
     $PYTHON ../cctbx_sources/libtbx/configure.py $cctbx_configargs
-    ./bin/libtbx.scons -j $NCPU no_boost_python=yes
+    ./bin/libtbx.scons -j $NCPU no_boost_python=1
     ( source setpaths.sh &&
       cd ../cctbx_sources/setup &&
       ./unix_integrate_cctbx.sh --yes --prefix=$PREFIX all
