@@ -135,6 +135,18 @@ ListSkipOrBuild cctbx || {
     )
 }
 
+ListSkipOrBuild patch_cctbx_pth || {
+    CCTBXBDIR=${SRCDIR}/cctbx/cctbx_build
+    cd $PYTHONDIR
+    cctbxpth="$(<cctbx.pth)"
+    lines=( ${(f)cctbxpth} )
+    if [[ -n ${(M)lines:#/*} ]]; then
+        lines[1]="import os; os.environ.setdefault('LIBTBX_BUILD', os.path.abspath(os.path.dirname(fullname) + '$($RELPATH $CCTBXBDIR .)'))"
+        lines=( ${lines[1]} ${(f)"$($RELPATH ${lines[2,-1]} .)"} )
+        print -l ${lines} >| cctbx.pth
+    fi
+}
+
 ListSkipOrBuild cxxtest || {
     cd $BINDIR && ln -sf ../src/cxxtest/bin/cxxtestgen && ls -L cxxtestgen
 }
