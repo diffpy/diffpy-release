@@ -37,7 +37,11 @@ gitrepos=(
 
 # Mercurial repositories for the sources in order of
 # (project, URL, branch[:TagOrHash])
-hgrepos=( )
+hgrepos=(
+    pycifrw
+        https://pavoljuhas@bitbucket.org/pavoljuhas/pycifrw
+        stable
+)
 
 # URLs to source code bundles as (directory, URL)
 tarballs=(
