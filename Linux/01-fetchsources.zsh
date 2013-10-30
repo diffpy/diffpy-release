@@ -8,28 +8,28 @@ SRCDIR=${MYDIR}/src
 # git repositories for the sources in order of
 # (project, URL, branch)
 gitrepos=(
-    diffpy.Structure    
+    diffpy.Structure
         https://github.com/diffpy/diffpy.Structure.git
         master
-    diffpy.utils    
+    diffpy.utils
         https://github.com/diffpy/diffpy.utils.git
         master
-    pyobjcryst      
+    pyobjcryst
         https://github.com/diffpy/pyobjcryst.git
         master
-    periodictable   
+    periodictable
         https://github.com/pkienzle/periodictable.git
         master
-    cxxtest         
+    cxxtest
         https://github.com/CxxTest/cxxtest.git
         master
-    libdiffpy       
+    libdiffpy
         https://github.com/diffpy/libdiffpy.git
         develop
-    diffpy.srreal   
+    diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
         develop
-    diffpy.srfit    
+    diffpy.srfit
         https://github.com/diffpy/diffpy.srfit.git
         master
 )
@@ -55,7 +55,7 @@ svnrepos=(
     sans/pr_inversion
         svn://svn@danse.us/sans/trunk/pr_inversion
 )
-        
+
 
 fetchgitrepository() {
     [[ $# == 3 ]] || exit $?
@@ -88,7 +88,7 @@ fetchtarball() {
     cd $tgtdir && curl -O $url
 }
 
-    
+
 # Download all required sources
 for t u b in $gitrepos;  fetchgitrepository $t $u $b
 for t u in $svnrepos;  fetchsvnrepository $t $u

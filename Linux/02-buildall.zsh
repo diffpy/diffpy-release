@@ -146,7 +146,7 @@ ListSkipOrBuild pyobjcrst || {
 ListSkipOrBuild libdiffpy || {
     cd $SRCDIR/libdiffpy
     scons -j $NCPU build=fast enable_objcryst=yes test
-    scons -j $NCPU build=fast enable_objcryst=yes prefix=$PREFIX install 
+    scons -j $NCPU build=fast enable_objcryst=yes prefix=$PREFIX install
 }
 
 ListSkipOrBuild diffpy.srreal || {
