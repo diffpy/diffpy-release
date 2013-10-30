@@ -186,7 +186,7 @@ ListSkipOrBuild diffpy.srfit || {
 ListSkipOrBuild patch_so_rpath || {
     libsofiles=( $LIBDIR/*.so(*) )
     pyextfiles=(
-        ${SRCDIR}/cctbx/cctbx_build/lib/*_ext.so(*)
+        ${SRCDIR}/cctbx/cctbx_build/lib/*_ext.so(*N)
         ${LIBDIR}/python*/site-packages/**/*.so(*)
     )
     typeset -aU depdirs
