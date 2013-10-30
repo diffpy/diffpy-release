@@ -117,12 +117,17 @@ ListSkipOrBuild cctbx || {
     mkdir -p ${SRCDIR}/cctbx/cctbx_build
     cctbx_configargs=(
         --no-bin-python
+        # 2013-10-30 PJ:
+        # cctbx Python extensions get linked to included boost_python, not
+        # sure if it is possible to link with the system boost_python.
+        # For now the build of extensions is disabled.
+        --build-boost-python-extensions=False
         mmtbx libtbx cctbx iotbx fftw3tbx rstbx spotfinder
         smtbx mmtbx cbflib clipper
     )
     cd ${SRCDIR}/cctbx/cctbx_build
     $PYTHON ../cctbx_sources/libtbx/configure.py $cctbx_configargs
-    ./bin/libtbx.scons -j $NCPU no_boost_python=1
+    ./bin/libtbx.scons -j $NCPU
     ( source setpaths.sh &&
       cd ../cctbx_sources/setup &&
       ./unix_integrate_cctbx.sh --yes --prefix=$PREFIX all
