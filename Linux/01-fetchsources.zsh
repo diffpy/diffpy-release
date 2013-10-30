@@ -1,5 +1,6 @@
 #!/bin/zsh -f
 
+setopt extendedglob
 setopt err_exit
 
 MYDIR="$(cd ${0:h} && pwd)"
@@ -33,6 +34,10 @@ gitrepos=(
         https://github.com/diffpy/diffpy.srfit.git
         master
 )
+
+# Mercurial repositories for the sources in order of
+# (project, URL, branch[:TagOrHash])
+hgrepos=( )
 
 # URLs to source code bundles as (directory, URL)
 tarballs=(
@@ -68,6 +73,21 @@ fetchgitrepository() {
 }
 
 
+fetchhgrepository() {
+    [[ $# == 3 ]] || exit $?
+    local tgtdir=$1 url=$2 branch=${3%%:*}
+    local tag=${${3#${branch}}##*:}
+    if [[ ! -d $tgtdir ]]; then
+        hg clone -b $branch $url $tgtdir
+    else
+        ( cd $tgtdir && hg pull -u -b $branch )
+    fi
+    if [[ -n $tag ]]; then
+        ( cd $tgtdir && hg update $tag )
+    fi
+}
+
+
 fetchsvnrepository() {
     [[ $# == 2 ]] || exit $?
     local tgtdir=$1 url=$2
@@ -89,6 +109,7 @@ fetchtarball() {
 # Download all required sources
 cd $SRCDIR
 for t u b in $gitrepos;  fetchgitrepository $t $u $b
+for t u b in $hgrepos;  fetchhgrepository $t $u $b
 for t u in $svnrepos;  fetchsvnrepository $t $u
 for t u in $tarballs;  fetchtarball $t $u
 
