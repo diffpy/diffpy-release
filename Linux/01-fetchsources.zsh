@@ -3,8 +3,14 @@
 setopt extendedglob
 setopt err_exit
 
+srcprefix=${1:-"src"}
+untar=${2:-"True"}
+
 MYDIR="$(cd ${0:h} && pwd)"
-SRCDIR=${MYDIR}/src
+SRCDIR=${MYDIR}/$srcprefix
+if [[ ! -d $SRCDIR ]];then
+    mkdir -p $SRCDIR
+fi
 
 # git repositories for the sources in order of
 # (project, URL, branch)
@@ -118,9 +124,11 @@ for t u in $svnrepos;  fetchsvnrepository $t $u
 for t u in $tarballs;  fetchtarball $t $u
 
 # extract tarballs
+if [[ $untar == True ]];then
+    print "untar the files"
+    cctbxbundle=${SRCDIR}/cctbx/cctbx_bundle.tar.gz
+    tar xzf $cctbxbundle -C ${cctbxbundle:h}
 
-cctbxbundle=${SRCDIR}/cctbx/cctbx_bundle.tar.gz
-tar xzf $cctbxbundle -C ${cctbxbundle:h}
-
-newmatbundle=${SRCDIR}/pyobjcryst/libobjcryst/newmat/newmat11.tar.gz
-tar xzf $newmatbundle -C ${newmatbundle:h}
+    newmatbundle=${SRCDIR}/pyobjcryst/libobjcryst/newmat/newmat11.tar.gz
+    tar xzf $newmatbundle -C ${newmatbundle:h}
+fi

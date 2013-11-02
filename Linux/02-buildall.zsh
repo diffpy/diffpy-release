@@ -99,7 +99,6 @@ cd $SRCDIR
 
 ListSkipOrBuild pycifrw || {
     cd ${SRCDIR}/pycifrw/pycifrw
-    make
     ${PYTHON} setup.py install --prefix=$PREFIX
 }
 
