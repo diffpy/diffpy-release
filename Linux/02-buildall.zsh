@@ -98,8 +98,11 @@ fi
 cd $SRCDIR
 
 ListSkipOrBuild pycifrw || {
-    cd ${SRCDIR}/pycifrw/pycifrw
-    ${PYTHON} setup.py install --prefix=$PREFIX
+    #cd ${SRCDIR}/pycifrw/pycifrw
+    #make
+    #${PYTHON} setup.py install --prefix=$PREFIX
+    $EASY_INSTALL -UZN --prefix=$PREFIX \
+        ${SRCDIR}/pycifrw/PyCifRW-3.6.1.tar.gz
 }
 
 ListSkipOrBuild diffpy.Structure || {

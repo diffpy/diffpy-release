@@ -55,6 +55,8 @@ tarballs=(
         http://cci.lbl.gov/cctbx_build/results/2013_07_05_0005/cctbx_bundle.tar.gz
     pyobjcryst/libobjcryst/newmat
         http://www.robertnz.net/ftp/newmat11.tar.gz
+    pycifrw
+        https://bitbucket.org/jamesrhester/pycifrw/downloads/PyCifRW-3.6.1.tar.gz
 )
 
 # Subversion repositories as (targetpath, URL)
@@ -112,14 +114,14 @@ fetchtarball() {
         return
     fi
     mkdir -p $tgtdir
-    ( cd $tgtdir && curl -O $url )
+    ( cd $tgtdir && wget $url )
 }
 
 
 # Download all required sources
 cd $SRCDIR
 for t u b in $gitrepos;  fetchgitrepository $t $u $b
-for t u b in $hgrepos;  fetchhgrepository $t $u $b
+#for t u b in $hgrepos;  fetchhgrepository $t $u $b
 for t u in $svnrepos;  fetchsvnrepository $t $u
 for t u in $tarballs;  fetchtarball $t $u
 
