@@ -132,7 +132,8 @@ ListSkipOrBuild cctbx || {
     ./bin/libtbx.scons -j $NCPU
     ( source setpaths.sh &&
       cd ../cctbx_sources/setup &&
-      ./unix_integrate_cctbx.sh --yes --prefix=$PREFIX all
+      ./unix_integrate_cctbx.sh \
+            --prefix=$PREFIX --yes pylibs libs includes
     )
 }
 
