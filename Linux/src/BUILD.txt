@@ -1,3 +1,11 @@
+System packages required for source build
+
+    apt-get install \
+        git libboost-all-dev libgsl-dev mercurial noweb python-dev \
+        python-numpy python-setuptools scons wget zsh
+
+
+FIXME:  remove below when not necessary
 Installation Order
 
 pycifrw
