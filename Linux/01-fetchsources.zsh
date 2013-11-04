@@ -3,14 +3,8 @@
 setopt extendedglob
 setopt err_exit
 
-srcprefix=${1:-"src"}
-untar=${2:-"True"}
-
 MYDIR="$(cd ${0:h} && pwd)"
-SRCDIR=${MYDIR}/$srcprefix
-if [[ ! -d $SRCDIR ]];then
-    mkdir -p $SRCDIR
-fi
+SRCDIR=${MYDIR}/src
 
 # git repositories for the sources in order of
 # (project, URL, branch)
@@ -55,8 +49,6 @@ tarballs=(
         http://cci.lbl.gov/cctbx_build/results/2013_07_05_0005/cctbx_bundle.tar.gz
     pyobjcryst/libobjcryst/newmat
         http://www.robertnz.net/ftp/newmat11.tar.gz
-    pycifrw
-        https://bitbucket.org/jamesrhester/pycifrw/downloads/PyCifRW-3.6.1.tar.gz
 )
 
 # Subversion repositories as (targetpath, URL)
@@ -114,23 +106,13 @@ fetchtarball() {
         return
     fi
     mkdir -p $tgtdir
-    ( cd $tgtdir && wget $url )
+    ( cd $tgtdir && wget -N $url && tar xzf ${url:t} )
 }
 
 
 # Download all required sources
 cd $SRCDIR
 for t u b in $gitrepos;  fetchgitrepository $t $u $b
-#for t u b in $hgrepos;  fetchhgrepository $t $u $b
+for t u b in $hgrepos;  fetchhgrepository $t $u $b
 for t u in $svnrepos;  fetchsvnrepository $t $u
 for t u in $tarballs;  fetchtarball $t $u
-
-# extract tarballs
-if [[ $untar == True ]];then
-    print "untar the files"
-    cctbxbundle=${SRCDIR}/cctbx/cctbx_bundle.tar.gz
-    tar xzf $cctbxbundle -C ${cctbxbundle:h}
-
-    newmatbundle=${SRCDIR}/pyobjcryst/libobjcryst/newmat/newmat11.tar.gz
-    tar xzf $newmatbundle -C ${newmatbundle:h}
-fi
