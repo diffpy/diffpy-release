@@ -11,10 +11,10 @@
         ipython \
 
 
-(2) Create a symbolic link to the diffpy-u12x64.pth file in
+(2) Create a symbolic link to the diffpy-1.0.pth file in
     /usr/local/lib/python2.7/dist-packages using:
 
-    sudo ln -si $PWD/diffpy-u12x64.pth /usr/local/lib/python2.7/dist-packages/
+    sudo ln -si $PWD/diffpy-1.0.pth /usr/local/lib/python2.7/dist-packages/
 
 
 (3) Test the installation with
