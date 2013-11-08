@@ -26,3 +26,7 @@ python.versions     26 27
 if {$subport ne $name} {
     depends_lib         port:py${python.version}-numpy
 }
+
+if {$name != $subport} {
+    depends_build       port:py${python.version}-setuptools
+}
