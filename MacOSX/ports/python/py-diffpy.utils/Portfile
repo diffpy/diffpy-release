@@ -1,12 +1,13 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 # $Id$
 
-PortSystem 1.0
-PortGroup python 1.0
+PortSystem          1.0
+PortGroup           python 1.0
 
 name                py-diffpy.utils
+set real_name       diffpy.utils
 version             1.0
-categories          python
+categories-append   science
 license             BSD
 maintainers         gmail.com:kevinrknox
 description         General purpose shared utilities for diffpy.
@@ -14,7 +15,7 @@ long_description    A collection of small shared functions used by SrFit and PDF
 platforms           darwin
 supported_archs     noarch
 
-homepage            http://www.diffpy.org
+homepage            http://www.diffpy.org/
 fetch.type          git
 git.url             https://github.com/diffpy/diffpy.utils.git
 git.branch          origin/master
