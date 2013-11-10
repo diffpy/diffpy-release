@@ -6,7 +6,7 @@
         python-setuptools \
         python-wxtools \
         python-numpy \
-        python-scipty \
+        python-scipy \
         python-matplotlib \
         ipython \
 
