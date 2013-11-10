@@ -13,6 +13,9 @@ cp -rlu bin include lib share src *.pth runtests.sh INSTALL.txt $PACKAGE/
 # clean files
 ./00-clean.zsh $PACKAGE
 
+cp /usr/lib/libboost_python-py27.so.1.46.1 $PACKAGE/lib
+cp /usr/lib/libboost_serialization.so.1.46.1 $PACKAGE/lib
+
 # finally create the tar bundle
 tar czf ${PACKAGE}.tar.gz \
     --numeric-owner --owner=0 --group=0 $PACKAGE
