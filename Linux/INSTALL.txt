@@ -1,20 +1,36 @@
-(1) Install the required Ubuntu Packages with:
+(1) Install the required system packages using:
 
     sudo apt-get install \
-        libgsl0ldbl \
+        libgsl0-dev \
         libboost-all-dev \
+        python-dev \
         python-setuptools \
-        python-wxtools \
         python-numpy \
         python-scipy \
         python-matplotlib \
         ipython \
 
+    This works on Ubuntu Linux or other Debian-based distributions.
+    Other Linux distributions may use different software manager,
+    but the package names should be equal or very similar to those
+    above.
 
-(2) Create a symbolic link to the diffpy-1.0.pth file in
-    /usr/local/lib/python2.7/dist-packages using:
+
+(2) For a one-user installation determine the Python directory for user
+    files, create it if it does not exist yet, and add there a symbolic
+    link to the diffpy-1.0.pth file:
+
+    D="$(python -c 'import site; print site.USER_SITE')"
+    mkdir -p "$D"
+    ln -si $PWD/diffpy-1.0.pth "$D"/
+
+    For a system-wide installation create symbolic link in the directory
+    for system-wide Python packages:
 
     sudo ln -si $PWD/diffpy-1.0.pth /usr/local/lib/python2.7/dist-packages/
+
+    Note it is essential to use the symbolic link.  Making a copy of the
+    pth file would not work.
 
 
 (3) Test the installation with
