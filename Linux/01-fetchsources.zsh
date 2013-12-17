@@ -7,7 +7,7 @@ MYDIR="$(cd ${0:h} && pwd)"
 SRCDIR=${MYDIR}/src
 
 # git repositories for the sources in order of
-# (project, URL, branch)
+# (project, URL, branch[:TagOrHash])
 gitrepos=(
     diffpy.Structure
         https://github.com/diffpy/diffpy.Structure.git
@@ -68,11 +68,18 @@ svnrepos=(
 
 fetchgitrepository() {
     [[ $# == 3 ]] || exit $?
-    local tgtdir=$1 url=$2 branch=$3
+    local tgtdir=$1 url=$2 branch=${3%%:*}
+    local tag=${${3#${branch}}##*:}
     if [[ ! -d $tgtdir ]]; then
         git clone -b $branch $url $tgtdir
-    else
-        ( cd $tgtdir && git pull origin $branch )
+    else (
+        cd $tgtdir &&
+        git checkout $branch &&
+        git pull --tags origin $branch
+        )
+    fi
+    if [[ -n $tag ]]; then
+        cd $tgtdir && git checkout $tag
     fi
 }
 
