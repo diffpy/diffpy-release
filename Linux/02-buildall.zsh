@@ -106,6 +106,13 @@ cd $SRCDIR
 
 ListSkipOrBuild pycifrw || {
     cd ${SRCDIR}/pycifrw/pycifrw
+    # An empty CifFile.py would make the build fail.
+    # Start from a clean state.
+    emptyciffile=( CifFile.py(NL0) )
+    if [[ -n $emptyciffile ]]; then
+        rm *(.)
+        hg update --clean
+    fi
     make
     ${PYTHON} setup.py install --prefix=$PREFIX
 }
