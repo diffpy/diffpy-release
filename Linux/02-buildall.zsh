@@ -6,10 +6,11 @@ umask 022
 
 DOC="\
 ${0:t} build all codes for the diffpy Linux bundle.
-usage: ${0:t} [options] [FIRST] [LAST]
+usage: ${0:t} [options] [N1] [N2] [FIRST-LAST]
 
-With no arguments all packages are built in sequence.  Otherwise the build
-starts at package number FIRST and terminates after package LAST.
+With no arguments all packages are built in sequence.  Otherwise build
+only packages given as arguments, where each argument is either a
+single package number or an inclusive range of indices FIRST-LAST.
 Use option --list for displaying package numbers.
 
 Options:
@@ -39,8 +40,14 @@ if [[ -n ${opt_help} ]]; then
     exit
 fi
 
-integer FIRST=${1:-"1"}
-integer LAST=${2:-"9999"}
+typeset -U selection
+for n; do
+    if [[ $n == [[:digit:]]##-[[:digit:]]## ]]; then
+        selection=( $selection {${n%%-*}..${n##*-}} )
+    else
+        selection=( $selection $n )
+    fi
+done
 
 # Resolve parameters that can be overloaded from the environment -------------
 
@@ -76,11 +83,11 @@ integer BIDX=0
 ListSkipOrBuild() {
     local name=${1?}
     (( ++BIDX ))
-    if [[ -n ${opt_list} ]]; then
-        print $BIDX $name
+    if [[ -n ${selection} && -z ${(M)selection:#${BIDX}} ]]; then
         return 0
     fi
-    if [[ $BIDX -lt $FIRST || $BIDX -gt $LAST ]]; then
+    if [[ -n ${opt_list} ]]; then
+        print $BIDX $name
         return 0
     fi
     local dashline="# $BIDX $name ${(l:80::-:):-}"
