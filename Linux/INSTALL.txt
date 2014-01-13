@@ -8,6 +8,7 @@
         python-numpy \
         python-scipy \
         python-matplotlib \
+        python-lxml \
         ipython \
 
     This works on Ubuntu Linux or other Debian-based distributions.
