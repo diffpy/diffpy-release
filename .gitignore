@@ -16,3 +16,5 @@
 /MacOSX/ports/PortIndex
 /MacOSX/ports/PortIndex.quick
 *.swp
+.project
+.pydevproject
