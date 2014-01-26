@@ -1,0 +1,63 @@
+If you are using python comes with Linux distruction, install the 
+required system packages using:
+
+sudo apt-get install \
+    libgsl0-dev \
+    libboost-all-dev \
+    python-dev \
+    python-setuptools \
+    python-numpy \
+    python-scipy \
+    python-matplotlib \
+    python-lxml \
+    ipython \
+    mercurial\
+    noweb\
+    scons\
+    wget\
+    zsh
+
+This works on Ubuntu Linux or other Debian-based distributions.
+Other Linux distributions may use different software manager,
+but the package names should be equal or very similar to those
+above.
+
+NOTE: if you are using python other than system python, such as 
+Enthought Python Distribution, you may need to rebuild the 
+boost-python and boost-serialization libraries from source. Since 
+the default boost-libraries and your python may have different 
+unicode length and raise errors when running the build. 
+
+To build boost-python and boost-serialization libraries:
+1. download the source code from boost website
+        http://www.boost.org/
+2. cd to the directory of the source code: (xx is the version)
+        
+        tar jxvf boost_1_xx_0.tar.bz2
+        cd boost_1_xx_0
+        ./bootstrap.sh --with-libraries=python,serialization
+        ./b2
+        
+3. then install the libraries by
+        
+        ./b2 install
+        
+    or modify the enviroment variables by adding following lines
+    to .zshrc(or .bashrc..)
+        
+        export LIBRARY_PATH=/path/to/boost_1_xx_0/stage/lib:$LIBRARY_PATH
+        export LD_LIBRARY_PATH=/path/to/boost_1_xx_0/stage/lib:$LD_LIBRARY_PATH
+        export CPATH=/path/to/boost_1_xx_0/:$CPATH
+    
+    or adding them using any other methods and make sure the
+    compiler can find them.
+
+After installing all packages you can try to download and build
+
+1. fetch the source code
+
+        ./01-fetchsources.zsh
+
+2. build all source code
+
+        ./02-buildall.zsh
