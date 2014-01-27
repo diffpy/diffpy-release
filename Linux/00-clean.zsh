@@ -45,12 +45,12 @@ if [[ $PACKAGE == $MYDIR ]]; then
     else
         # clean the boost and examples of cctbx
         ${CCTBXBUILD}/bin/libtbx.scons -c -C $CCTBXBUILD
-        rm -vrf ${CCTBXSOURCES}/boost
+        #rm -vrf ${CCTBXSOURCES}/boost
         rm -vrf ${CCTBXSOURCES}/phenix_examples
 
         # clean up tar bundles from 01-fetchsources.zsh
         rm -vf $PACKAGE/src/cctbx/cctbx_bundle.tar.gz
-        rm -vf $PACKAGE/src/cctbx/cctbx_install_script.csh
+        #rm -vf $PACKAGE/src/cctbx/cctbx_install_script.csh
         rm -vf $PACKAGE/src/pyobjcryst/libobjcryst/newmat/newmat11.tar.gz
         # check if any of the unwanted files are still around
         allfiles=( ${PACKAGE}/**/*~*.git*(.N) )
