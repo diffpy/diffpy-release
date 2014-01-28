@@ -1,5 +1,4 @@
-If you are using python comes with Linux distruction, install the 
-required system packages using:
+Install the required system packages using:
 
 sudo apt-get install \
     libgsl0-dev \
