@@ -21,6 +21,10 @@ Other Linux distributions may use different software manager,
 but the package names should be equal or very similar to those
 above.
 
+patchelf is also required and can be downloaded from,
+    
+    http://hydra.nixos.org/release/patchelf/patchelf-0.7
+
 NOTE: if you are using python other than system python, such as 
 Enthought Python Distribution, you may need to rebuild the 
 boost-python and boost-serialization libraries from source. Since 
