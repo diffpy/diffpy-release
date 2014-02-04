@@ -37,3 +37,11 @@
 (3) Test the installation with
 
     ./runtests.sh
+
+(optional:4) update and rebuild:
+
+    ./update-srfit.zsh
+    
+    This will first clean pervious build, fetch the latest source code,
+    and build all packages in place. Then you can run the test again to 
+    test if the new build works.
