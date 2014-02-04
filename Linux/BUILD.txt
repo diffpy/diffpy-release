@@ -25,11 +25,25 @@ patchelf is also required and can be downloaded from,
     
     http://hydra.nixos.org/release/patchelf/patchelf-0.7
 
-NOTE: if you are using python other than system python, such as 
-Enthought Python Distribution, you may need to rebuild the 
+
+After installing all packages you can try to download and build
+the code by
+
+1. fetch the source code
+
+        ./01-fetchsources.zsh
+
+2. build all source code
+
+        ./02-buildall.zsh
+
+
+NOTES: if you are using python other than system python, such as 
+Enthought Python Distribution, and filed in building or testing
+the soce, you may need to rebuild the 
 boost-python and boost-serialization libraries from source. Since 
 the default boost-libraries and your python may have different 
-unicode length and raise errors when running the build. 
+unicode length.  
 
 To build boost-python and boost-serialization libraries:
 1. download the source code from boost website
@@ -43,24 +57,16 @@ To build boost-python and boost-serialization libraries:
         
 3. then install the libraries by
         
-        ./b2 install
+        sudo ./b2 install
         
-    or modify the enviroment variables by adding following lines
-    to .zshrc(or .bashrc..)
+    OR modify the enviroment variables by adding following lines
+    to .zshrc(or .bashrc..) (replace the /path/to/boost_1xx_0/
+    with the actual boost library path)
         
         export LIBRARY_PATH=/path/to/boost_1_xx_0/stage/lib:$LIBRARY_PATH
         export LD_LIBRARY_PATH=/path/to/boost_1_xx_0/stage/lib:$LD_LIBRARY_PATH
         export CPATH=/path/to/boost_1_xx_0/:$CPATH
     
-    or adding them using any other methods and make sure the
-    compiler can find them.
-
-After installing all packages you can try to download and build
-
-1. fetch the source code
-
-        ./01-fetchsources.zsh
-
-2. build all source code
-
-        ./02-buildall.zsh
+    OR adding them using any other methods and make sure the
+    compiler can find them. After that, you can try to build 
+    the souce code by running ./02-buildall.zsh
