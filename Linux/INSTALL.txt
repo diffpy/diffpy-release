@@ -38,7 +38,7 @@
 
     ./runtests.sh
 
-(optional:4) update and rebuild:
+(4, optional) update and rebuild:
 
     Install the required system packages using:
 
