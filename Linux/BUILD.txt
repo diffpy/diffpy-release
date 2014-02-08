@@ -1,20 +1,10 @@
 Install the required system packages using:
 
-sudo apt-get install \
-    libgsl0-dev \
-    libboost-all-dev \
-    python-dev \
-    python-setuptools \
-    python-numpy \
-    python-scipy \
-    python-matplotlib \
-    python-lxml \
-    ipython \
-    mercurial\
-    noweb\
-    scons\
-    wget\
-    zsh
+System packages required for source build
+
+    apt-get install \
+        git libboost-all-dev libgsl0-dev mercurial noweb python-dev \
+        python-numpy python-setuptools scons wget zsh noweb
 
 This works on Ubuntu Linux or other Debian-based distributions.
 Other Linux distributions may use different software manager,
@@ -27,46 +17,6 @@ patchelf is also required and can be downloaded from,
 
 
 After installing all packages you can try to download and build
-the code by
+the code with
 
-1. fetch the source code
-
-        ./01-fetchsources.zsh
-
-2. build all source code
-
-        ./02-buildall.zsh
-
-
-NOTES: if you are using python other than system python, such as 
-Enthought Python Distribution, and filed in building or testing
-the soce, you may need to rebuild the 
-boost-python and boost-serialization libraries from source. Since 
-the default boost-libraries and your python may have different 
-unicode length.  
-
-To build boost-python and boost-serialization libraries:
-1. download the source code from boost website
-        http://www.boost.org/
-2. cd to the directory of the source code: (xx is the version)
-        
-        tar jxvf boost_1_xx_0.tar.bz2
-        cd boost_1_xx_0
-        ./bootstrap.sh --with-libraries=python,serialization
-        ./b2
-        
-3. then install the libraries by
-        
-        sudo ./b2 install
-        
-    OR modify the enviroment variables by adding following lines
-    to .zshrc(or .bashrc..) (replace the /path/to/boost_1xx_0/
-    with the actual boost library path)
-        
-        export LIBRARY_PATH=/path/to/boost_1_xx_0/stage/lib:$LIBRARY_PATH
-        export LD_LIBRARY_PATH=/path/to/boost_1_xx_0/stage/lib:$LD_LIBRARY_PATH
-        export CPATH=/path/to/boost_1_xx_0/:$CPATH
-    
-    OR adding them using any other methods and make sure the
-    compiler can find them. After that, you can try to build 
-    the souce code by running ./02-buildall.zsh
+    ./update.zsh
