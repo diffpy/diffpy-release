@@ -40,11 +40,30 @@
 
 (optional:4) update and rebuild:
 
+    Install the required system packages using:
+
+    apt-get install \
+        git libboost-all-dev libgsl0-dev mercurial noweb python-dev \
+        python-numpy python-setuptools scons wget zsh noweb
+
+    This works on Ubuntu Linux or other Debian-based distributions.
+    Other Linux distributions may use different software manager,
+    but the package names should be equal or very similar to those
+    above.
+    
+    patchelf is also required and can be downloaded from,
+    
+    http://hydra.nixos.org/release/patchelf/patchelf-0.7
+
+
+    After installing all packages you can try to download and build
+    the code with
+
     ./update.zsh
     
     This will first clean pervious build, fetch the latest source code,
     and build all packages in place. Then you can run the test again to 
-    test if the new build works.
+    test the new build.
     
 Note:
     If you experience some errors in runtests.sh such as 
