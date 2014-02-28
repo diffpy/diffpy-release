@@ -129,47 +129,13 @@ ListSkipOrBuild periodictable || {
     $EASY_INSTALL -UZN --prefix=$PREFIX ${SRCDIR}/periodictable
 }
 
-ListSkipOrBuild cctbx || {
-    mkdir -p ${SRCDIR}/cctbx/cctbx_build
-    cctbx_configargs=(
-        --no-bin-python
-        # 2013-10-30 PJ:
-        # cctbx Python extensions get linked to included boost_python, not
-        # sure if it is possible to link with the system boost_python.
-        # For now the build of extensions is disabled.
-        --build-boost-python-extensions=False
-        mmtbx libtbx cctbx iotbx fftw3tbx rstbx spotfinder
-        smtbx mmtbx cbflib clipper
-    )
-    cd ${SRCDIR}/cctbx/cctbx_build
-    $PYTHON ../cctbx_sources/libtbx/configure.py $cctbx_configargs
-    ./bin/libtbx.scons -j $NCPU
-    ( source setpaths.sh &&
-      cd ../cctbx_sources/setup &&
-      ./unix_integrate_cctbx.sh \
-            --prefix=$PREFIX --yes pylibs libs includes
-    )
-}
-
-ListSkipOrBuild patch_cctbx_pth || {
-    CCTBXBDIR=${SRCDIR}/cctbx/cctbx_build
-    cd $PYTHONDIR
-    cctbxpth="$(<cctbx.pth)"
-    lines=( ${(f)cctbxpth} )
-    if [[ -n ${(M)lines:#/*} ]]; then
-        lines[1]="import os; os.environ.setdefault('LIBTBX_BUILD', os.path.abspath(os.path.dirname(fullname) + '$($RELPATH $CCTBXBDIR .)'))"
-        lines=( ${lines[1]} ${(f)"$($RELPATH ${lines[2,-1]} .)"} )
-        print -l ${lines} >| cctbx.pth
-    fi
-}
-
 ListSkipOrBuild cxxtest || {
     cd $BINDIR && ln -sf ../src/cxxtest/bin/cxxtestgen && ls -L cxxtestgen
 }
 
 ListSkipOrBuild libObjCryst || {
-    cd $SRCDIR/pyobjcryst/libobjcryst
-    $SCONS -j $NCPU build=fast with_shared_cctbx=yes prefix=$PREFIX install
+    cd $SRCDIR/libobjcryst/build/bundle
+    $SCONS -j $NCPU build=fast prefix=$PREFIX install
 }
 
 ListSkipOrBuild pyobjcrst || {
@@ -215,7 +181,6 @@ ListSkipOrBuild diffpy.srfit || {
 ListSkipOrBuild patch_so_rpath || {
     libsofiles=( $LIBDIR/*.so(*) )
     pyextfiles=(
-        ${SRCDIR}/cctbx/cctbx_build/lib/*_ext.so(*N)
         ${LIBDIR}/python*/site-packages/**/*.so(*)
     )
     typeset -aU depdirs

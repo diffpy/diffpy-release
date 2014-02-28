@@ -12,6 +12,8 @@ cp -rlu bin include lib share src *.pth runtests.sh INSTALL.txt $PACKAGE/
 cp -rlu buildtools update.zsh $PACKAGE/
 cp -rlu 00-clean.zsh 01-fetchsources.zsh 02-buildall.zsh $PACKAGE/buildtools
 
+rm -rf $PACKAGE/src/libobjcryst/build
+
 # clean files
 ./00-clean.zsh $PACKAGE
 

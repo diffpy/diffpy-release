@@ -27,6 +27,9 @@ gitrepos=(
     libdiffpy
         https://github.com/diffpy/libdiffpy.git
         develop
+    libobjcryst
+        https://github.com/diffpy/libobjcryst.git
+        master
     diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
         develop
@@ -45,16 +48,16 @@ hgrepos=(
 
 # URLs to source code bundles as (directory, URL)
 tarballs=(
-    cctbx
-        http://cci.lbl.gov/cctbx_build/results/2013_07_05_0005/cctbx_bundle.tar.gz
-    pyobjcryst/libobjcryst/newmat
-        http://www.robertnz.net/ftp/newmat11.tar.gz
+    #cctbx
+    #    http://cci.lbl.gov/cctbx_build/results/2013_07_05_0005/cctbx_bundle.tar.gz
+    #pyobjcryst/libobjcryst/newmat
+    #    http://www.robertnz.net/ftp/newmat11.tar.gz
 )
 
 # Subversion repositories as (targetpath, URL)
 svnrepos=(
-    pyobjcryst/libobjcryst/ObjCryst
-        https://svn.code.sf.net/p/objcryst/code/trunk/ObjCryst
+    #pyobjcryst/libobjcryst/ObjCryst
+    #    https://svn.code.sf.net/p/objcryst/code/trunk/ObjCryst
     sans/data_util
         svn://svn@danse.us/common/util
     sans/sansdataloader
@@ -123,3 +126,5 @@ for t u b in $gitrepos;  fetchgitrepository $t $u $b
 for t u b in $hgrepos;  fetchhgrepository $t $u $b
 for t u in $svnrepos;  fetchsvnrepository $t $u
 for t u in $tarballs;  fetchtarball $t $u
+
+cd $SRCDIR/libobjcryst && ./makesdist --clean && ./makesdist 1-3

@@ -9,8 +9,13 @@ PACKAGE=${1:-$MYDIR}
 
 # clean up all git repositories
 for gd in ${PACKAGE}/src/*/.git(:h); do
-    (cd $gd && git clean -fdX)
+    if [[ $gd != *libobjcryst ]]; then
+        (cd $gd && git clean -fdX)
+    fi
 done
+
+# clean boost related
+rm -vrf ${PACKAGE}/src/boost
 
 # clean up pycifrw
 rm -vrf ${PACKAGE}/src/pycifrw/pycifrw/build
@@ -24,15 +29,11 @@ rm -vrf ${PACKAGE}/src/sans/sansmodels/build
 # remove any pyc files
 find ${PACKAGE} -type f -name '*.pyc' -print0 | xargs -0 -r rm -v
 
-
-# clean up intermediate object files in cctbx_build
-CCTBXBUILD=$PACKAGE/src/cctbx/cctbx_build
-CCTBXSOURCES=$PACKAGE/src/cctbx/cctbx_sources
-
 if [[ $PACKAGE == $MYDIR ]]; then
+    # clean libobjcryst
+    cd $PACKAGE/src/libobjcryst && ./makesdist --clean && cd $PACKAGE
     # clean the build files
-    rm -vrf bin include lib share $CCTBXSOURCES $CCTBXBUILD
-    cd $PACKAGE/src/cctbx && tar xzf cctbx_bundle.tar.gz
+    rm -vrf bin include lib share
     # check if any of the unwanted files are still around
     allfiles=( ${PACKAGE}/**/*~*.git*(.N) )
     undesired=(
@@ -43,15 +44,6 @@ if [[ $PACKAGE == $MYDIR ]]; then
     )
 
     else
-        # clean the boost and examples of cctbx
-        ${CCTBXBUILD}/bin/libtbx.scons -c -C $CCTBXBUILD
-        #rm -vrf ${CCTBXSOURCES}/boost
-        rm -vrf ${CCTBXSOURCES}/phenix_examples
-
-        # clean up tar bundles from 01-fetchsources.zsh
-        rm -vf $PACKAGE/src/cctbx/cctbx_bundle.tar.gz
-        #rm -vf $PACKAGE/src/cctbx/cctbx_install_script.csh
-        rm -vf $PACKAGE/src/pyobjcryst/libobjcryst/newmat/newmat11.tar.gz
         # check if any of the unwanted files are still around
         allfiles=( ${PACKAGE}/**/*~*.git*(.N) )
         undesired=(
@@ -59,9 +51,6 @@ if [[ $PACKAGE == $MYDIR ]]; then
             ${PACKAGE}/**/*(-@N)
             ${(M)allfiles:#*.o}
             ${(M)allfiles:#*.py[oc]}
-            ${(M)allfiles:#*/cctbx_bundle.tar.gz}
-            ${(M)allfiles:#*/cctbx_install_script.csh}
-            ${(M)allfiles:#*/newmat11.tar.gz}
         )
 fi
 
