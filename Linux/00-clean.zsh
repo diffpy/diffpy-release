@@ -15,7 +15,7 @@ for gd in ${PACKAGE}/src/*/.git(:h); do
 done
 
 # clean boost related
-rm -vrf ${PACKAGE}/src/boost
+# rm -vrf ${PACKAGE}/src/boost
 
 # clean up pycifrw
 rm -vrf ${PACKAGE}/src/pycifrw/pycifrw/build
