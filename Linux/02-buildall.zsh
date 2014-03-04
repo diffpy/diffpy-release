@@ -134,7 +134,7 @@ ListSkipOrBuild cxxtest || {
 }
 
 ListSkipOrBuild libObjCryst || {
-    cd $SRCDIR/libobjcryst/build/bundle
+    cd $SRCDIR/libobjcryst
     $SCONS -j $NCPU build=fast prefix=$PREFIX install
 }
 
