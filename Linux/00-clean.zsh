@@ -9,9 +9,7 @@ PACKAGE=${1:-$MYDIR}
 
 # clean up all git repositories
 for gd in ${PACKAGE}/src/*/.git(:h); do
-    if [[ $gd != *libobjcryst ]]; then
-        (cd $gd && git clean -fdX)
-    fi
+    (cd $gd && git clean -fdX)
 done
 
 # clean boost related
@@ -30,8 +28,6 @@ rm -vrf ${PACKAGE}/src/sans/sansmodels/build
 find ${PACKAGE} -type f -name '*.pyc' -print0 | xargs -0 -r rm -v
 
 if [[ $PACKAGE == $MYDIR ]]; then
-    # clean libobjcryst
-    cd $PACKAGE/src/libobjcryst && ./makesdist --clean && cd $PACKAGE
     # clean the build files
     rm -vrf bin include lib share
     # check if any of the unwanted files are still around
