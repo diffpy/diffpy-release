@@ -111,11 +111,13 @@ fetchsvnrepository() {
 fetchtarball() {
     [[ $# == 2 ]] || exit $?
     local tgtdir=$1 url=$2
-    if [[ -f ${tgtdir}/${url:t} ]]; then
-        return
+    local wget_opts
+    wget_opts=( --timestamping --no-verbose )
+    if [[ -d /opt/local/share/curl ]]; then
+        wget_opts+=( --ca-directory=/opt/local/share/curl )
     fi
     mkdir -p $tgtdir
-    ( cd $tgtdir && wget -N $url && tar xzf ${url:t} )
+    ( cd $tgtdir && wget $wget_opts $url )
 }
 
 
