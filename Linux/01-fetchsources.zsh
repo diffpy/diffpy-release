@@ -3,8 +3,8 @@
 setopt extendedglob
 setopt err_exit
 
-MYDIR="$(cd ${0:h} && pwd)"
-SRCDIR=${MYDIR}/src
+BASEDIR="${0:A:h}"
+SRCDIR=${BASEDIR}/src
 
 # git repositories for the sources in order of
 # (project, URL, branch[:TagOrHash])
@@ -122,8 +122,11 @@ fetchtarball() {
 
 
 # Download all required sources
+mkdir -p $SRCDIR
 cd $SRCDIR
 for t u b in $gitrepos;  fetchgitrepository $t $u $b
 for t u b in $hgrepos;  fetchhgrepository $t $u $b
 for t u in $svnrepos;  fetchsvnrepository $t $u
 for t u in $tarballs;  fetchtarball $t $u
+# Finally copy addons to the SRCDIR.
+rsync -a ${BASEDIR}/src-addons/ ${SRCDIR}/

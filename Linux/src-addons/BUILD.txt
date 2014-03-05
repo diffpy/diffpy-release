@@ -3,7 +3,7 @@ System packages required for source build
     apt-get install \
         git libboost-all-dev libgsl0-dev mercurial noweb python-dev \
         python-numpy python-setuptools scons wget zsh
-    
+
     patchelf is required
 
 
