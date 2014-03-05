@@ -29,7 +29,7 @@ gitrepos=(
         develop
     libobjcryst
         https://github.com/diffpy/libobjcryst.git
-        master:v1.9.8a-8
+        master:v1.9.8b
     diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
         develop
