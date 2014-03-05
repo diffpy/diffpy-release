@@ -118,15 +118,15 @@ ListSkipOrBuild pycifrw || {
 }
 
 ListSkipOrBuild diffpy.Structure || {
-    $EASY_INSTALL -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.Structure
+    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.Structure
 }
 
 ListSkipOrBuild diffpy.utils || {
-    $EASY_INSTALL -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.utils
+    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.utils
 }
 
 ListSkipOrBuild periodictable || {
-    $EASY_INSTALL -UZN --prefix=$PREFIX ${SRCDIR}/periodictable
+    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/periodictable
 }
 
 ListSkipOrBuild cxxtest || {
@@ -175,7 +175,7 @@ ListSkipOrBuild sans/pr_inversion || {
 }
 
 ListSkipOrBuild diffpy.srfit || {
-    $EASY_INSTALL -UZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
+    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
 }
 
 ListSkipOrBuild patch_so_rpath || {
