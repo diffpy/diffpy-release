@@ -74,8 +74,14 @@ fetchgitrepository() {
         git pull --tags origin $branch
         )
     fi
-    if [[ -n $tag ]]; then
-        ( cd $tgtdir && git checkout --quiet $tag )
+    if [[ -n $tag ]]; then (
+        cd $tgtdir
+        if [[ -n "$(git branch --contains $tag $branch)" ]]; then
+            git reset --hard $tag
+        else
+            git checkout --quiet $tag
+        fi
+        )
     fi
 }
 
