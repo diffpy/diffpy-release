@@ -26,13 +26,13 @@ gitrepos=(
         master
     libdiffpy
         https://github.com/diffpy/libdiffpy.git
-        develop
+        master
     libobjcryst
         https://github.com/diffpy/libobjcryst.git
         master:v1.9.8b
     diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
-        develop
+        master
     diffpy.srfit
         https://github.com/diffpy/diffpy.srfit.git
         master
