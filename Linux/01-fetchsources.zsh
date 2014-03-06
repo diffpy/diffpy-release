@@ -76,7 +76,7 @@ fetchgitrepository() {
     fi
     if [[ -n $tag ]]; then (
         cd $tgtdir
-        if [[ -n "$(git branch --contains $tag $branch)" ]]; then
+        if [[ -z "$(git log -1 $branch..$tag)" ]]; then
             git reset --hard $tag
         else
             git checkout --quiet $tag
