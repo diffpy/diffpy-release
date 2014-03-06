@@ -169,19 +169,3 @@ ListSkipOrBuild sans/pr_inversion || {
 ListSkipOrBuild diffpy.srfit || {
     $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
 }
-
-ListSkipOrBuild patch_so_rpath || {
-    libsofiles=( $LIBDIR/*.so(*) )
-    pyextfiles=(
-        ${LIBDIR}/python*/site-packages/**/*.so(*)
-    )
-    typeset -aU depdirs
-    for f in $libsofiles $pyextfiles; do
-        sodeps=( $(ldd $f | grep ${(F)libsofiles} | awk '$2 == "=>" {print $3}') )
-        [[ ${#sodeps} != 0 ]] || continue
-        depdirs=( $($RELPATH ${sodeps:h} ${f:h} ) )
-        depdirs=( ${${(M)depdirs:#.}/*/'$ORIGIN'} '$ORIGIN'/${^${depdirs:#.}} )
-        print "patchelf --set-rpath ${(j,:,)depdirs} $f"
-        patchelf --set-rpath ${(j,:,)depdirs} $f
-    done
-}
