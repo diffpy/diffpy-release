@@ -14,7 +14,7 @@ gitrepos=(
         master:v1.2b2
     diffpy.utils
         https://github.com/diffpy/diffpy.utils.git
-        master
+        master:v1.1b1
     pyobjcryst
         https://github.com/diffpy/pyobjcryst.git
         master
