@@ -66,7 +66,6 @@ INCLUDEDIR=${PREFIX}/include
 LIBDIR=${PREFIX}/lib
 PYTHON_VERSION=$($PYTHON -c 'import sys; print "%s.%s" % sys.version_info[:2]')
 PYTHONDIR=$LIBDIR/python${PYTHON_VERSION}/site-packages
-RELPATH=${MYDIR}/buildtools/relpath
 
 # Adjust environment variables used in the build -----------------------------
 
