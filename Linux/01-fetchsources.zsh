@@ -11,7 +11,7 @@ SRCDIR=${BASEDIR}/src
 gitrepos=(
     diffpy.Structure
         https://github.com/diffpy/diffpy.Structure.git
-        master
+        master:v1.2b2
     diffpy.utils
         https://github.com/diffpy/diffpy.utils.git
         master
