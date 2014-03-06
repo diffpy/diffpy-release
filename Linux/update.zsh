@@ -40,7 +40,7 @@ fi
 
 # build diffpy project
 if [[ ! -f 00-clean.zsh || ! -f 01-fetchsources.zsh || ! -f 02-buildall.zsh ]]; then
-    cp -f ./buildtools/*.zsh .
+    cp -f ./src-addons/*.zsh .
 fi
 
 ./00-clean.zsh
