@@ -17,13 +17,13 @@ gitrepos=(
         master:v1.1b1
     pyobjcryst
         https://github.com/diffpy/pyobjcryst.git
-        master
+        master:v1.0b4
     periodictable
         https://github.com/pkienzle/periodictable.git
-        master
+        master:v1.4.1
     cxxtest
         https://github.com/CxxTest/cxxtest.git
-        master
+        master:4.3
     libdiffpy
         https://github.com/diffpy/libdiffpy.git
         develop
