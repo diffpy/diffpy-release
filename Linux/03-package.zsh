@@ -9,10 +9,8 @@ cd $MYDIR
 PACKAGE=diffpy-1.0-$CPUTYPE-$(date '+%Y%m%d')
 mkdir -p $PACKAGE
 cp -rlu bin include lib share src src-addons *.pth runtests.sh INSTALL.txt $PACKAGE/
-cp -rlu buildtools update.zsh $PACKAGE/
-cp -rlu 00-clean.zsh 01-fetchsources.zsh 02-buildall.zsh $PACKAGE/buildtools
-
-rm -rf $PACKAGE/src/libobjcryst/build
+cp -rlu update.zsh $PACKAGE/
+cp -rlu 00-clean.zsh 01-fetchsources.zsh 02-buildall.zsh $PACKAGE/src-addons
 
 # clean files
 ./00-clean.zsh $PACKAGE
