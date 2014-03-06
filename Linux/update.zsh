@@ -6,20 +6,16 @@ Update and compile the diffpy pojects
 System packages required for source build
 
     apt-get install \
-        git libboost-all-dev libgsl0-dev mercurial noweb python-dev \
+        git libboost-all-dev libgsl0-dev mercurial python-dev \
         python-numpy python-setuptools scons wget zsh
-    
-patchelf is required and can be downloaded from
-
-    http://nixos.org/patchelf.html
 "
 
 MAXUNICODE=$(python -c 'import sys;print sys.maxunicode')
 tgtdir=src/boost
 boostdir=$tgtdir/boost_1_55_0
 url=http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.tar.bz2
-    
-fetchboost() {    
+
+fetchboost() {
     if [[ -f ${tgtdir}/${url:t} ]]; then
         return
     fi
@@ -54,4 +50,3 @@ fi
 if [[ $MAXUNICODE != 1114111 ]]; then
     cp -f $boostdir/stage/lib/* $PWD/lib
 fi
-

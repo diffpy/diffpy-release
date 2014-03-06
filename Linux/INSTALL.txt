@@ -43,42 +43,37 @@
     Install the required system packages using:
 
     apt-get install \
-        git libboost-all-dev libgsl0-dev mercurial noweb python-dev \
-        python-numpy python-setuptools scons wget zsh noweb
+        git libboost-all-dev libgsl0-dev mercurial python-dev \
+        python-numpy python-setuptools scons wget zsh
 
     This works on Ubuntu Linux or other Debian-based distributions.
     Other Linux distributions may use different software manager,
     but the package names should be equal or very similar to those
     above.
-    
-    patchelf is also required and can be downloaded from,
-    
-    http://hydra.nixos.org/release/patchelf/patchelf-0.7
-
 
     After installing all packages you can try to download and build
     the code with
 
     ./update.zsh
-    
+
     This will first clean pervious build, fetch the latest source code,
-    and build all packages in place. Then you can run the test again to 
+    and build all packages in place. Then you can run the test again to
     test the new build.
-    
+
 Note:
-    If you experience some errors in runtests.sh such as 
-    
+    If you experience some errors in runtests.sh such as
+
         undefined symbol: PyUnicodeUCS4_FromEncodedObject
-        
-    or 
-    
+
+    or
+
         undefined symbol: PyUnicodeUCS2_FromEncodedObject
-    
+
     It is usually because the python you are using is not compatible with
-    the prebuild boostpython library. (For example you are using Enthought 
+    the prebuild boostpython library. (For example you are using Enthought
     Python Distribution.) You can try to rebuild the whole diffpy
     projects with:
-    
+
     ./update.zsh
-    
-    This will rebuild the boost library used in diffpy projects. 
+
+    This will rebuild the boost library used in diffpy projects.
