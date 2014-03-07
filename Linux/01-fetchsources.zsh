@@ -52,13 +52,13 @@ tarballs=(
 # Subversion repositories as (targetpath, URL)
 svnrepos=(
     sans/data_util
-        svn://svn@danse.us/common/util@1501
+        svn://svn@danse.us/common/releases/util-1.0.0@1501
     sans/sansdataloader
-        svn://svn@danse.us/sans/trunk/sansdataloader@5489
+        svn://svn@danse.us/sans/releases/sansdataloader-1.0.0@5489
     sans/sansmodels
-        svn://svn@danse.us/sans/trunk/sansmodels@5489
+        svn://svn@danse.us/sans/releases/sansmodels-1.0.0@5489
     sans/pr_inversion
-        svn://svn@danse.us/sans/trunk/pr_inversion@5489
+        svn://svn@danse.us/sans/releases/pr_inversion-1.0.0@5489
 )
 
 
