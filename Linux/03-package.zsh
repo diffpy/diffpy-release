@@ -1,29 +1,57 @@
 #!/bin/zsh -f
+# Usage:
+#   ./03-package.zsh       # for binary distribution
+#   ./03-package.zsh src   # for source-only distribution
 
 setopt err_exit
 setopt extendedglob
 
-MYDIR="$(cd ${0:h} && pwd)"
+umask 022
+
+MYDIR=${0:A:h}
 cd $MYDIR
 
-PACKAGE=diffpy-1.0-$CPUTYPE-$(date '+%Y%m%d')
+# Use gnutar on Mac OS X
+TAR=tar
+if [[ $OSTYPE == darwin* ]]; then
+    TAR=gnutar
+fi
+
+# Support [src|source] argument for source-only package
+if [[ $1 != (src|source) ]]; then
+    WITH_BINARIES=1
+fi
+
+PKGNAME=diffpy_cmi
+VERSION=${${"$(git describe --match='v[[:digit:]]*')"%-g[[:xdigit:]]##}#v}
+
+if [[ -n $WITH_BINARIES ]]; then
+    pyversion=( lib/python2*(/om[1]:t) )
+    pyversion=${pyversion/thon/}
+    SUFFIX=-${pyversion}-${(L)$(uname -s)}-${CPUTYPE}
+fi
+
+PACKAGE=dist/${PKGNAME}-${VERSION}${SUFFIX}
 mkdir -p $PACKAGE
-cp -rlu bin include lib share src *.pth runtests.sh INSTALL.txt $PACKAGE/
-cp -rlu update.zsh $PACKAGE/
-mkdir -p $PACKAGE/buildtools
-cp -rlu 00-clean.zsh 01-fetchsources.zsh 02-buildall.zsh $PACKAGE/buildtools
+mkdir -p ${PACKAGE}/lib
 
-rm -rf $PACKAGE/src/libobjcryst/build
+# First copy only source distribution files
+excludes=(
+    build dist temp '.sconsign.*' .sconf_temp '*.pyc'
+    # remove subversion files in the packaged tree
+    .svn
+)
 
-# clean files
-./00-clean.zsh $PACKAGE
-
-cp /usr/lib/libboost_python-py27.so* $PACKAGE/lib
-cp /usr/lib/libboost_serialization.so* $PACKAGE/lib
+rsync -av --delete --link-dest=$PWD \
+    --exclude=$PACKAGE --exclude=${^excludes} \
+    bin include share src *.pth *.sh *.txt \
+    ${WITH_BINARIES+lib} \
+    $PACKAGE/
 
 # finally create the tar bundle
-tar czf ${PACKAGE}.tar.gz \
-    --numeric-owner --owner=0 --group=0 $PACKAGE
+$TAR czf ${PACKAGE}.tar.gz \
+    --directory ${PACKAGE:h} \
+    --numeric-owner --owner=0 --group=0 ${PACKAGE:t}
 
 # and remove the package directory itself
 rm -rf $PACKAGE
