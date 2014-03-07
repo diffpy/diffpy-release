@@ -128,5 +128,6 @@ for t u b in $gitrepos;  fetchgitrepository $t $u $b
 for t u b in $hgrepos;  fetchhgrepository $t $u $b
 for t u in $svnrepos;  fetchsvnrepository $t $u
 for t u in $tarballs;  fetchtarball $t $u
+
 # Finally copy addons to the SRCDIR.
-rsync -a ${BASEDIR}/src-addons/ ${SRCDIR}/
+rsync -av ${BASEDIR}/src-addons/ ${SRCDIR}/
