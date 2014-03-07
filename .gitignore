@@ -3,6 +3,7 @@
 /Linux/lib/
 /Linux/share/
 /Linux/src/
+/Linux/dist/
 /MacOSX/ports/PortIndex
 /MacOSX/ports/PortIndex.quick
 *.swp
