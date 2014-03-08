@@ -10,7 +10,7 @@ cd $MYDIR
 git clean -fdx --exclude=src
 
 # clean up all git repositories
-for gd in src/*/.git(:h); (
+for gd in src/*/.git(N:h); (
     cd $gd && git clean -fdx
 )
 
