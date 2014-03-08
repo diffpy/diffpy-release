@@ -4,6 +4,7 @@
 /Linux/share/
 /Linux/src/
 /Linux/dist/
+/Linux/.license.agreed
 /MacOSX/ports/PortIndex
 /MacOSX/ports/PortIndex.quick
 *.swp
