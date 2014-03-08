@@ -1,0 +1,365 @@
+#!/bin/sh
+# vim: ft=zsh
+
+# Re-launch using zsh --------------------------------------------------------
+
+if test -z "$ZSH_VERSION"; then
+    ZSH=/bin/zsh
+    if ! test -x "$ZSH"; then
+        ZSH=zsh
+    fi
+    if ! type "$ZSH" >/dev/null 2>&1; then
+        echo "This script requires Z shell.  Please install zsh using either of"
+        echo
+        echo '  sudo apt-get install zsh'
+        echo
+        echo '  sudo yum install zsh'
+        echo
+        exit 2
+    fi
+    exec $ZSH -f "$0" "$@"
+fi
+
+# running with zsh here
+
+emulate -R zsh
+umask 022
+setopt extendedglob
+
+# Constants ------------------------------------------------------------------
+
+DOC="\
+DiffPy-CMI installation utility
+usage: ./${0:t} [options]
+
+Options:
+
+  -n, --dry-run   list what would be done without making any changes.
+                  Display a list of steps when run with --build or --update.
+  --update[=steps]  perform all or selected software updates from online
+                  source repositories.  Update steps are comma separated
+                  integers or ranges such as '1,3,5-6'.  Use option -n to
+                  display the steps.
+  --build[=steps]   rebuild all or specified packages from sources in the
+                  src folder.  Use option -n to display the build steps.
+  -h, --help      display this message and exit
+"
+DOC=${${DOC##[[:space:]]##}%%[[:space:]]##}
+
+BASEDIR=${0:A:h}
+SRCDIR=${BASEDIR}/src
+PTHFILE=${BASEDIR}/diffpy_cmi.pth
+VERSION=vFIXME
+
+# Environment overridable variables
+: ${PYTHON:=python}
+: ${EASY_INSTALL:=easy_install}
+: ${SCONS:=scons}
+
+typeset -aU build_selection update_selection
+build_selection=( )
+update_selection=( )
+HASHLINE=${(l:78::#:):-}
+DASHLINE=${(l:78::-:):-}
+
+FINALINFO="\
+$HASHLINE
+Installation completed.
+$HASHLINE
+
+You can now execute './runtest.sh' to test the installation.
+
+If you plan to use the C++ libraries, consider including the following line
+in your shell setup file (.profile, .bashrc, .zshenv):
+
+source $(print -D ${BASEDIR}/diffpy_cmi_env.sh)
+"
+
+# Extract command-line options -----------------------------------------------
+
+zmodload zsh/zutil
+zparseopts -K -E -D \
+    n=opt_dryrun -dry-run=opt_dryrun \
+    h=opt_help -help=opt_help -update::=opt_update -build::=opt_build ||
+    exit $?
+
+if [[ -n $* ]]; then
+    print -u2 "Invalid arguments or options: $*"
+    exit 2
+fi
+
+if [[ -n ${opt_help} ]]; then
+    print -r -- $DOC
+    exit
+fi
+
+# Functions ------------------------------------------------------------------
+
+expand_ranges() {
+    local ARRAYNAME=${1?}
+    shift
+    local -aU acontent
+    local n
+    acontent=( ${=${argv//,/\ }} )
+    for n in ${acontent}; do
+        if [[ $n == [[:digit:]]##-[[:digit:]]## ]]; then
+            acontent[(i)$n]=( {${n%%-*}..${n##*-}} )
+        elif [[ $n == [[:digit:]]## ]]; then
+            continue
+        elif [[ $n == all ]]; then
+            acontent[(i)$n]=( {1..50} )
+        else
+            print -u2 "Invalid range value '$n'."
+            exit 2
+        fi
+    done
+    set -A ${ARRAYNAME} $acontent
+}
+
+
+do_license() {
+    if [[ -n ${opt_dryrun} ]]; then
+        return
+    fi
+    if [[ -f ${BASEDIR}/.license.agreed ]]; then
+        return
+    fi
+    print
+    print "Press <space> to display the license."
+    read -sk1
+    more ${BASEDIR}/LICENSE.txt
+    print
+    print -- $HASHLINE
+    read -q "?Do you agree with the license terms? (y/n) "
+    print -- $HASHLINE
+    if [[ $REPLY != [yY] ]]; then
+        exit 1
+    fi
+    touch ${BASEDIR}/.license.agreed
+}
+
+
+integer UIDX=0
+integer BIDX=0
+
+ListSkipOrDo() {
+    local selection
+    local idx
+    case $1 in
+        (build)
+            idx=$(( ++BIDX ))
+            selection=( $build_selection )
+            ;;
+        (update)
+            idx=$(( ++UIDX ))
+            selection=( $update_selection )
+            ;;
+        (*)
+            print -u2 "Invalid argument $1"
+            exit 2
+    esac
+    local name=${2?}
+    if [[ -z ${(M)selection:#${idx}} ]]; then
+        return 0
+    fi
+    if [[ -n ${opt_dryrun} ]]; then
+        typeset -gA didheader
+        if [[ -z ${didheader[$1]} ]]; then
+            didheader[$1]=1
+            print "\n[dry run] - ignored $1 steps:"
+        fi
+        print "  $idx $name"
+        return 0
+    fi
+    local sepline="# $idx $name ${(l:80::-:):-}"
+    print ${sepline[1,78]}
+    # return false status to trigger the build section
+    return 1
+}
+
+
+do_update() {
+    setopt localoptions
+    setopt err_exit
+    ListSkipOrDo update "src/libobjcryst" || (
+        cd $SRCDIR/libobjcryst
+        git fetch origin --tags
+        versiontags=( ${(f)"$(git tag --list 'v[[:digit:]]*')"} )
+        git checkout ${versiontags[-1]}
+    )
+    ListSkipOrDo update "src/libdiffpy" || {
+        cd $SRCDIR/libdiffpy && git pull origin
+    }
+    ListSkipOrDo update "src/diffpy.Structure" || (
+        cd $SRCDIR/diffpy.Structure && git pull origin
+    )
+    ListSkipOrDo update "src/diffpy.utils" || (
+        cd $SRCDIR/diffpy.utils && git pull origin
+    )
+    ListSkipOrDo update "src/pyobjcryst" || (
+        cd $SRCDIR/pyobjcryst && git pull origin
+    )
+    ListSkipOrDo update "src/diffpy.srreal" || (
+        cd $SRCDIR/diffpy.srreal && git pull origin
+    )
+    ListSkipOrDo update "src/diffpy.srfit" || (
+        cd $SRCDIR/diffpy.srfit && git pull origin
+    )
+}
+
+
+do_build() {
+    setopt localoptions
+    setopt err_exit
+
+    BINDIR=${BASEDIR}/bin
+    INCLUDEDIR=${BASEDIR}/include
+    LIBDIR=${BASEDIR}/lib
+    PYTHON_VERSION=$($PYTHON -c \
+        'import sys; print "%s.%s" % sys.version_info[:2]')
+    PYTHON_VERSION=$($PYTHON -c 'import sys; print "%s.%s" % sys.version_info[:2]')
+    PYTHONDIR=$LIBDIR/python${PYTHON_VERSION}/site-packages
+    : ${NCPU:=$(${PYTHON} -c \
+        'from multiprocessing import cpu_count; print cpu_count()')}
+
+    export PATH=${BASEDIR}/bin:$PATH
+    export LIBRARY_PATH=${BASEDIR}/lib:$LIBRARY_PATH
+    export LD_LIBRARY_PATH=${BASEDIR}/lib:$LD_LIBRARY_PATH
+    export CPATH=$BASEDIR/include:$CPATH
+    export PYTHONPATH=$PYTHONDIR:$PYTHONPATH
+
+    if [[ -z ${opt_dryrun} && -n ${build_selection} ]]; then
+        mkdir -p $BINDIR $INCLUDEDIR $LIBDIR $PYTHONDIR
+    fi
+
+    ListSkipOrDo build "PyCifRW" || {
+        $EASY_INSTALL -N --zip-ok --prefix=$BASEDIR \
+            ${SRCDIR}/pycifrw/PyCifRW-*.tar.gz(om[1])
+    }
+    ListSkipOrDo build "diffpy.Structure" || {
+        $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.Structure
+    }
+    ListSkipOrDo build "diffpy.utils" || {
+        $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.utils
+    }
+    ListSkipOrDo build "periodictable" || {
+        $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/periodictable
+    }
+    ListSkipOrDo build "cxxtest" || {
+        cd $BASEDIR/bin &&
+            ln -sf ../src/cxxtest/bin/cxxtestgen && ls -L cxxtestgen
+    }
+    ListSkipOrDo build "libObjCryst" || {
+        cd $SRCDIR/libobjcryst
+        $SCONS -j $NCPU build=fast prefix=$BASEDIR install
+    }
+    ListSkipOrDo build "pyobjcryst" || {
+        cd $SRCDIR/pyobjcryst
+        $SCONS -j $NCPU prefix=$BASEDIR install
+    }
+    ListSkipOrDo build "libdiffpy" || {
+        cd $SRCDIR/libdiffpy
+        $SCONS -j $NCPU enable_objcryst=yes prefix=$BASEDIR install
+    }
+    ListSkipOrDo build "diffpy.srreal" || {
+        cd $SRCDIR/diffpy.srreal
+        $SCONS -j $NCPU prefix=$BASEDIR install
+    }
+    ListSkipOrDo build "diffpy.srfit" || {
+        $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.srfit
+    }
+    ListSkipOrDo build "sans packages" || {
+        cd ${SRCDIR}/sans/data_util
+        ${PYTHON} setup.py install --prefix=$BASEDIR
+        cd ${SRCDIR}/sans/sansdataloader
+        ${PYTHON} setup.py install --prefix=$BASEDIR
+        cd ${SRCDIR}/sans/sansmodels
+        ${PYTHON} setup.py install --prefix=$BASEDIR
+        cd ${SRCDIR}/sans/pr_inversion
+        ${PYTHON} setup.py install --prefix=$BASEDIR
+    }
+}
+
+
+do_install() {
+    print $HASHLINE
+    print "Welcome to DiffPy-CMI ${VERSION?}"
+    print $HASHLINE
+    print
+    print "Use of this software is subject to the terms in LICENSE.txt."
+    do_license;
+    if [[ ! -d ${BASEDIR}/lib ]]; then
+        print
+        print "Source only-distribution - building all packages."
+        expand_ranges build_selection all
+        do_build
+    fi
+    if [[ -n ${opt_dryrun} ]]; then
+        print "\n[dry run] - installation of symbolic links skipped."
+        exit
+    fi
+    local USER_SITE="$(${PYTHON} -c 'import site; print site.USER_SITE')"
+    local d=$(print -rD -- $USER_SITE)
+    local TGTDIR=${USER_SITE}
+    print
+    print "Python path directory for installing ${PTHFILE:t}"
+    vared -p '--> ' TGTDIR
+    TGTDIR=${TGTDIR%%[[:space:]]##}
+    if [[ -z $TGTDIR ]]; then
+        print "No directory, no installation.  Goodbye."
+        exit 1
+    fi
+    if [[ ! -d $TGTDIR ]]; then
+        print "Directory $TGTDIR does not exist."
+        if read -q '?Create? (y/n) '; then
+            mkdir -p ${TGTDIR} || exit $?
+            print
+        else
+            print "\nNo directory, no installation.  Goodbye."
+            exit 1
+        fi
+    fi
+    if [[ ${PTHFILE} -ef ${TGTDIR}/${PTHFILE:t} && -L ${TGTDIR}/${PTHFILE:t} ]];
+    then
+        print "Symbolic link to ${PTHFILE:t} already exists, good!"
+    else
+        print "Creating symbolic link"
+        ln -siv ${PTHFILE} ${TGTDIR} || exit $?
+    fi
+    TGTDIR=${HOME}/bin
+    d=$(print -rD -- $TGTDIR)
+    print "\nDirectory in the PATH for executable scripts"
+    vared -p "--> " TGTDIR
+    if [[ ! -d ${TGTDIR} ]]; then
+        print -D "Directory $TGTDIR does not exist, scripts not installed."
+    else
+        local f
+        print "Creating symbolic links:"
+        for f in ${BASEDIR}/bin/*(-*N); do
+            if [[ $f -ef ${TGTDIR}/${f:t} ]]; then continue; fi
+            ln -siv $f ${TGTDIR}
+        done
+        d=( ${^path}(Ne:'[[ $REPLY -ef $TGTDIR ]]':) )
+        if [[ -z $d ]]; then
+            print -D "Warning: $TGTDIR is not in the PATH."
+        fi
+    fi
+    print
+    print $FINALINFO
+}
+
+# Main section here ----------------------------------------------------------
+
+if [[ -n ${opt_update} ]]; then
+    expand_ranges update_selection ${${opt_update##--update=#}:-all}
+    do_update
+fi
+
+if [[ -n ${opt_build} ]]; then
+    expand_ranges build_selection ${${opt_build##--build=#}:-all}
+    do_build
+fi
+
+if [[ -z "${opt_update}${opt_build}" ]]; then
+    do_install
+fi
