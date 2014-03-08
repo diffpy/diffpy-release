@@ -168,3 +168,22 @@ ListSkipOrBuild sans/pr_inversion || {
 ListSkipOrBuild diffpy.srfit || {
     $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
 }
+
+# Skip when building on Mac OS X
+[[ $OSTYPE == darwin* ]] ||
+ListSkipOrBuild "copy boost libraries" || {
+    typeset -aU boostdeplibs
+    for f in $LIBDIR/**/*.so(*N); do
+        boostdeplibs+=( 
+            $(ldd $f | awk '$1 ~ /^libboost_/ && $2 == "=>" {print $3}')
+        )
+    done
+    if [[ -n ${boostdeplibs} ]]; then
+        rsync -a ${boostdeplibs} $LIBDIR/
+    fi
+    cd $LIBDIR
+    for bp in ${boostdeplibs:t}; do
+        tgt=${bp%.so*}.so
+        [[ $bp -ef $tgt ]] || ln -sv ${bp} $tgt
+    done
+}
