@@ -129,7 +129,7 @@ ListSkipOrBuild libObjCryst || {
     $SCONS -j $NCPU build=fast prefix=$PREFIX install
 }
 
-ListSkipOrBuild pyobjcrst || {
+ListSkipOrBuild pyobjcryst || {
     cd $SRCDIR/pyobjcryst
     $SCONS -j $NCPU build=fast prefix=$PREFIX install
 }
