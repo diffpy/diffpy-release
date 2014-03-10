@@ -13,8 +13,6 @@ cp -rlu update.zsh $PACKAGE/
 mkdir -p $PACKAGE/buildtools
 cp -rlu 00-clean.zsh 01-fetchsources.zsh 02-buildall.zsh $PACKAGE/buildtools
 
-rm -rf $PACKAGE/src/libobjcryst/build
-
 # clean files
 ./00-clean.zsh $PACKAGE
 
