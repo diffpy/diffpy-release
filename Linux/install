@@ -180,8 +180,6 @@ ListSkipOrDo() {
 
 
 do_update() {
-    setopt localoptions
-    setopt err_exit
     ListSkipOrDo update "src/libobjcryst" || (
         cd $SRCDIR/libobjcryst
         git fetch origin --tags
@@ -210,9 +208,6 @@ do_update() {
 
 
 do_build() {
-    setopt localoptions
-    setopt err_exit
-
     BINDIR=${BASEDIR}/bin
     INCLUDEDIR=${BASEDIR}/include
     LIBDIR=${BASEDIR}/lib
@@ -285,11 +280,19 @@ do_install() {
     print
     print "Use of this software is subject to the terms in LICENSE.txt."
     do_license;
-    if [[ ! -d ${BASEDIR}/lib ]]; then
+    local libfiles
+    libfiles=( ${BASEDIR}/lib/*.(so|dylib)(N) )
+    if [[ ${#libfiles} -lt 2 ]]; then
         print
         print "Source only-distribution - building all packages."
         expand_ranges build_selection all
-        do_build
+        do_build || {
+            print "Build failure, installation stopped."
+            print
+            print "Check if required software is installed and try again with"
+            print "./install --build"
+            exit 2
+        }
     fi
     if [[ -n ${opt_dryrun} ]]; then
         print "\n[dry run] - installation of symbolic links skipped."
@@ -352,12 +355,16 @@ do_install() {
 
 if [[ -n ${opt_update} ]]; then
     expand_ranges update_selection ${${opt_update##--update=#}:-all}
+    setopt err_exit
     do_update
+    setopt noerr_exit
 fi
 
 if [[ -n ${opt_build} ]]; then
     expand_ranges build_selection ${${opt_build##--build=#}:-all}
+    setopt err_exit
     do_build
+    setopt noerr_exit
 fi
 
 if [[ -z "${opt_update}${opt_build}" ]]; then
