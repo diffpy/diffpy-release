@@ -267,6 +267,12 @@ if [[ -n $opt_clean ]]; then
     )
 fi
 
+
+if [[ -z ${opt_list} && -n $selection ]]; then
+    mkdir -p $INCLUDEDIR $LIBDIR $PYTHONDIR
+fi
+
+
 ListSkipOrBuild "download upstream sources" || (
     mkdir -p $SRCDIR
     cd $SRCDIR
@@ -383,7 +389,7 @@ ListSkipOrBuild "create diffpy_cmi tarball" || {
         install src *.pth *.sh *.txt
     )
     if [[ -z ${opt_source} ]]; then
-        sourcepaths+=( bin(N) include share lib )
+        sourcepaths+=( bin(N) share include lib )
     fi
     rsync -av --delete --link-dest=$BASEDIR \
         --exclude=$PACKAGE --exclude=${^excludes} \
