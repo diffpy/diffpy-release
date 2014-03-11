@@ -69,8 +69,8 @@ $HASHLINE
 
 You can now execute './runtest.sh' to test the installation.
 
-If you plan to use the C++ libraries, consider including following lines
-in your shell setup file (.profile, .bashrc, .zshenv):
+If you plan to use the C++ libraries, consider adding the following lines
+to your shell startup file (.profile, .bashrc, or .zshenv):
 
 export CPATH=${BASEDIR}/include:\$CPATH
 export LIBRARY_PATH=${BASEDIR}/lib:\$LIBRARY_PATH
@@ -132,6 +132,7 @@ do_license() {
     print
     print -- $HASHLINE
     read -q "?Do you agree with the license terms? (y/n) "
+    print
     print -- $HASHLINE
     if [[ $REPLY != [yY] ]]; then
         exit 1
@@ -284,15 +285,25 @@ do_install() {
     libfiles=( ${BASEDIR}/lib/*.(so|dylib)(N) )
     if [[ ${#libfiles} -lt 2 ]]; then
         print
-        print "Source only-distribution - building all packages."
+        print "Source only-distribution - we need to re-build all packages."
+        read -q '?Proceed? (y/n) '; print
+        if [[ $REPLY != [yY] ]]; then
+            print "Installation cancelled."
+            exit 1
+        fi
         expand_ranges build_selection all
         do_build || {
-            print "Build failure, installation stopped."
+            print "Build failure, installation cancelled."
             print
             print "Check if required software is installed and try again with"
             print "./install --build"
             exit 2
         }
+        if [[ -z ${opt_dryrun} ]]; then
+            print "\n$HASHLINE"
+            print "All packages built successfully."
+            print "$HASHLINE"
+        fi
     fi
     if [[ -n ${opt_dryrun} ]]; then
         print "\n[dry run] - installation of symbolic links skipped."
@@ -306,7 +317,7 @@ do_install() {
     vared -p '--> ' TGTDIR
     TGTDIR=${TGTDIR%%[[:space:]]##}
     if [[ -z $TGTDIR ]]; then
-        print "No directory, installation stopped."
+        print "No directory, installation cancelled."
         exit 1
     fi
     if [[ ! -d $TGTDIR ]]; then
@@ -315,7 +326,7 @@ do_install() {
             mkdir -p ${TGTDIR} || exit $?
             print
         else
-            print "\nNo directory, installation stopped."
+            print "\nNo directory, installation cancelled."
             exit 1
         fi
     fi
