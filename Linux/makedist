@@ -8,8 +8,9 @@ DOC="\
 ${0:t} create binary or source bundle for the diffpy_cmi release.
 usage: ${0:t} [options] [all] [N] [N1-N2]
 
-Perform selected build steps in sequence.  Select all steps with 'all'
-or only specific steps with a step number N or a range N1-N2.
+With no arguments all build steps are performed in sequence.  Otherwise
+perform only steps given as arguments, where each argument is either a
+single package number or an inclusive range of indices FIRST-LAST.
 Use option --list to display all steps.
 
 Options:
@@ -95,8 +96,6 @@ svnrepos=(
 
 # Parse command-line options -------------------------------------------------
 
-[[ 0 != $# ]] || opt_help=1
-
 zmodload zsh/zutil
 zparseopts -K -E -D \
     h=opt_help -help=opt_help l=opt_list -list=opt_list \
@@ -121,12 +120,8 @@ for n; do
     fi
 done
 
-if [[ -n ${opt_list} && -z ${selection} ]]; then
+if [[ -z ${opt_clean} && -z ${selection} ]]; then
     selection=( {1..100} )
-fi
-
-if [[ -z ${opt_source} ]]; then
-    WITH_BINARIES=1
 fi
 
 # Resolve parameters that can be overloaded from the environment -------------
@@ -175,7 +170,7 @@ integer BIDX=0
 
 ListSkipOrBuild() {
     local name=${1?}
-    if [[ $2 == binary && -z $WITH_BINARIES ]]; then
+    if [[ $2 == binary && -n $opt_source ]]; then
         return 0
     fi
     (( ++BIDX ))
@@ -255,7 +250,7 @@ fetchtarball() {
 
 if [[ -n $opt_clean ]]; then
     cd $BASEDIR
-    print "# Clean all generated files except of source downloads."
+    print "# Cleaning all generated files except of source downloads."
     # Clean any generated files except the src directory
     git clean -fdx --exclude=src
 
@@ -357,7 +352,7 @@ ListSkipOrBuild diffpy.srfit binary || {
 ListSkipOrBuild "copy boost libraries" binary || {
     typeset -aU boostdeplibs
     for f in $LIBDIR/**/*.so(*N); do
-        boostdeplibs+=( 
+        boostdeplibs+=(
             $(ldd $f | awk '$1 ~ /^libboost_/ && $2 == "=>" {print $3}')
         )
     done
@@ -380,17 +375,21 @@ ListSkipOrBuild "create diffpy_cmi tarball" || {
         # remove subversion files in the packaged tree
         .svn
     )
+    sourcepaths=(
+        install src *.pth *.sh *.txt
+    )
+    if [[ -z ${opt_source} ]]; then
+        sourcepaths+=( bin(N) include share lib )
+    fi
     rsync -av --delete --link-dest=$BASEDIR \
         --exclude=$PACKAGE --exclude=${^excludes} \
-        install bin include share src *.pth *.sh *.txt \
-        ${WITH_BINARIES+lib} \
-        $PACKAGE/
+        ${sourcepaths?} $PACKAGE/
     # finally create the tar bundle
     $TAR czf ${PACKAGE}.tar.gz \
         --directory ${PACKAGE:h} \
         --numeric-owner --owner=0 --group=0 ${PACKAGE:t}
 }
 
-ListSkipOrBuild "cleanup the PACKAGE directory" || {
+ListSkipOrBuild "clean the temporary package tree" || {
     rm -rf $PACKAGE
 }
