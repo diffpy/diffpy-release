@@ -49,7 +49,7 @@ DOC=${${DOC##[[:space:]]##}%%[[:space:]]##}
 BASEDIR=${0:A:h}
 SRCDIR=${BASEDIR}/src
 PTHFILE=${BASEDIR}/diffpy_cmi.pth
-VERSION=vFIXME
+VERSION=$(cd $BASEDIR && test -s VERSION.txt && <VERSION.txt)
 
 # Environment overridable variables
 : ${PYTHON:=python}
