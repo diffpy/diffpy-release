@@ -245,10 +245,6 @@ do_build() {
     ListSkipOrDo build "periodictable" || {
         $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/periodictable
     }
-    ListSkipOrDo build "cxxtest" || {
-        cd $BASEDIR/bin &&
-            ln -sf ../src/cxxtest/bin/cxxtestgen && ls -L cxxtestgen
-    }
     ListSkipOrDo build "libObjCryst" || {
         cd $SRCDIR/libobjcryst
         $SCONS -j $NCPU build=fast prefix=$BASEDIR install

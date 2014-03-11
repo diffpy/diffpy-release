@@ -1,9 +1,14 @@
 # Local tweaks to the scons build environment.
 
+import os.path
 Import('env')
 
 # Set RPATH to make the libdiffpy shared library search its
 # own directory for other required shared libraries.
 env.AppendUnique(LINKFLAGS="-Wl,-rpath,'$$ORIGIN'")
+
+# determine installation path of the cxxtest framework
+env['CXXTEST_INSTALL_DIR'] = os.path.abspath(
+        os.path.join(Dir('.').abspath, '../cxxtest'))
 
 # vim: ft=python

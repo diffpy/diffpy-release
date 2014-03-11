@@ -120,10 +120,6 @@ ListSkipOrBuild periodictable || {
     $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/periodictable
 }
 
-ListSkipOrBuild cxxtest || {
-    cd $BINDIR && ln -sf ../src/cxxtest/bin/cxxtestgen && ls -L cxxtestgen
-}
-
 ListSkipOrBuild libObjCryst || {
     cd $SRCDIR/libobjcryst
     $SCONS -j $NCPU build=fast prefix=$PREFIX install
