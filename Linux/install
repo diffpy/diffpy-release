@@ -69,10 +69,11 @@ $HASHLINE
 
 You can now execute './runtest.sh' to test the installation.
 
-If you plan to use the C++ libraries, consider including the following line
+If you plan to use the C++ libraries, consider including following lines
 in your shell setup file (.profile, .bashrc, .zshenv):
 
-source $(print -D ${BASEDIR}/diffpy_cmi_env.sh)
+export CPATH=${BASEDIR}/include:\$CPATH
+export LIBRARY_PATH=${BASEDIR}/lib:\$LIBRARY_PATH
 "
 
 # Extract command-line options -----------------------------------------------
@@ -302,7 +303,7 @@ do_install() {
     vared -p '--> ' TGTDIR
     TGTDIR=${TGTDIR%%[[:space:]]##}
     if [[ -z $TGTDIR ]]; then
-        print "No directory, no installation.  Goodbye."
+        print "No directory, installation stopped."
         exit 1
     fi
     if [[ ! -d $TGTDIR ]]; then
@@ -311,7 +312,7 @@ do_install() {
             mkdir -p ${TGTDIR} || exit $?
             print
         else
-            print "\nNo directory, no installation.  Goodbye."
+            print "\nNo directory, installation stopped."
             exit 1
         fi
     fi
@@ -324,17 +325,20 @@ do_install() {
     fi
     TGTDIR=${HOME}/bin
     d=$(print -rD -- $TGTDIR)
-    print "\nDirectory in the PATH for executable scripts"
+    print "\nDirectory for installing executable scripts"
     vared -p "--> " TGTDIR
     if [[ ! -d ${TGTDIR} ]]; then
         print -D "Directory $TGTDIR does not exist, scripts not installed."
     else
-        local f
-        print "Creating symbolic links:"
-        for f in ${BASEDIR}/bin/*(-*N); do
-            if [[ $f -ef ${TGTDIR}/${f:t} ]]; then continue; fi
-            ln -siv $f ${TGTDIR}
-        done
+        local f scriptfiles
+        scriptfiles=( ${BASEDIR}/bin/*(-*N) )
+        scriptfiles=( ${^scriptfiles}(Ne:'[[ ! $REPLY -ef $TGTDIR/${REPLY:t} ]]':) )
+        if [[ -z ${scriptfiles} ]]; then
+            print "Scripts are already installed, good."
+        else
+            print "Creating symbolic links:"
+            ln -siv $scriptfiles ${TGTDIR}
+        fi
         d=( ${^path}(Ne:'[[ $REPLY -ef $TGTDIR ]]':) )
         if [[ -z $d ]]; then
             print -D "Warning: $TGTDIR is not in the PATH."
