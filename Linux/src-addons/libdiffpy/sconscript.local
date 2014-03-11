@@ -4,6 +4,6 @@ Import('env')
 
 # Set RPATH to make the libdiffpy shared library search its
 # own directory for other required shared libraries.
-env.AppendUnique(LINKFLAGS="-Wl,-rpath='$$ORIGIN'")
+env.AppendUnique(LINKFLAGS="-Wl,-rpath,'$$ORIGIN'")
 
 # vim: ft=python
