@@ -44,7 +44,7 @@ excludes=(
 
 rsync -av --delete --link-dest=$PWD \
     --exclude=$PACKAGE --exclude=${^excludes} \
-    bin include share src *.pth *.sh *.txt \
+    install bin include share src *.pth *.sh *.txt \
     ${WITH_BINARIES+lib} \
     $PACKAGE/
 
