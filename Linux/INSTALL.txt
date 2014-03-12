@@ -19,16 +19,16 @@
 
 (2) For a one-user installation determine the Python directory for user
     files, create it if it does not exist yet, and add there a symbolic
-    link to the diffpy-1.0.pth file:
+    link to the diffpy_cmi.pth file:
 
     D="$(python -c 'import site; print site.USER_SITE')"
     mkdir -p "$D"
-    ln -si $PWD/diffpy-1.0.pth "$D"/
+    ln -si $PWD/diffpy_cmi.pth "$D"/
 
     For a system-wide installation create symbolic link in the directory
     for system-wide Python packages:
 
-    sudo ln -si $PWD/diffpy-1.0.pth /usr/local/lib/python2.7/dist-packages/
+    sudo ln -si $PWD/diffpy_cmi.pth /usr/local/lib/python2.7/dist-packages/
 
     Note it is essential to use the symbolic link.  Making a copy of the
     pth file would not work.
