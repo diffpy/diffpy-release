@@ -44,13 +44,13 @@ PKGNAME=diffpy_cmi
 gitrepos=(
     diffpy.Structure
         https://github.com/diffpy/diffpy.Structure.git
-        master:v1.2b2
+        master:2a4d253
     diffpy.utils
         https://github.com/diffpy/diffpy.utils.git
-        master:v1.1b1
+        master:9b5f351
     pyobjcryst
         https://github.com/diffpy/pyobjcryst.git
-        master:v1.0b4
+        master:075dbe9
     periodictable
         https://github.com/pkienzle/periodictable.git
         master:v1.4.1
@@ -65,10 +65,10 @@ gitrepos=(
         master:v1.9.8b
     diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
-        master:v1.0a0
+        master:c4fd5c2
     diffpy.srfit
         https://github.com/diffpy/diffpy.srfit.git
-        master:v1.0b4
+        master:82b26db
 )
 
 # Mercurial repositories for the sources in order of
@@ -266,7 +266,6 @@ if [[ -n $opt_clean ]]; then
         rm -vrf $junkfiles
     )
 fi
-
 
 ListSkipOrBuild "download upstream sources" || (
     mkdir -p $SRCDIR
