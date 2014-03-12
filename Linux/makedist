@@ -281,8 +281,13 @@ ListSkipOrBuild "copy src-addons to the source tree" || {
     rsync -av ${BASEDIR}/src-addons/ ${SRCDIR}/
 }
 
-ListSkipOrBuild "write VERSION.txt" || {
+ListSkipOrBuild "update version files" || {
     print -r "$VERSION" >| ${BASEDIR}/VERSION.txt
+    cd $SRCDIR
+    for f in $(grep -l version.cfg */setup.py(N) /dev/null); (
+        cd ${f:h}
+        python setup.py egg_info
+    )
 }
 
 ListSkipOrBuild pycifrw binary || {
