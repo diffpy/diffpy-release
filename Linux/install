@@ -22,7 +22,7 @@ fi
 
 # running with zsh here
 
-emulate -R zsh
+emulate zsh
 umask 022
 setopt extendedglob
 
@@ -62,6 +62,7 @@ update_selection=( )
 HASHLINE=${(l:78::#:):-}
 DASHLINE=${(l:78::-:):-}
 
+BASEDIRSHORT=${BASEDIR/(#b)(#s)(${HOME})(\/#*)/\~${match[2]}}
 FINALINFO="\
 $HASHLINE
 Installation completed.
@@ -72,8 +73,8 @@ You can now execute './runtest.sh' to test the installation.
 If you plan to use the C++ libraries, consider adding the following lines
 to your shell startup file (.profile, .bashrc, or .zshenv):
 
-export CPATH=${BASEDIR}/include:\$CPATH
-export LIBRARY_PATH=${BASEDIR}/lib:\$LIBRARY_PATH
+export CPATH=${BASEDIRSHORT}/include:\$CPATH
+export LIBRARY_PATH=${BASEDIRSHORT}/lib:\$LIBRARY_PATH
 "
 
 # Extract command-line options -----------------------------------------------
