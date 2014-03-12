@@ -119,6 +119,15 @@ expand_ranges() {
 }
 
 
+expand_tilde() {
+    setopt localoptions
+    setopt nonomatch noglob
+    if [[ ${(P)${1?}} == (#b)([~][^/]#)(*) ]]; then
+        typeset -g $1=${~match[1]}${match[2]}
+    fi
+}
+
+
 do_license() {
     if [[ -n ${opt_dryrun} ]]; then
         return
@@ -311,12 +320,12 @@ do_install() {
         exit
     fi
     local USER_SITE="$(${PYTHON} -c 'import site; print site.USER_SITE')"
-    local d=$(print -rD -- $USER_SITE)
     local TGTDIR=${USER_SITE}
     print
     print "Python path directory for installing ${PTHFILE:t}"
     vared -p '--> ' TGTDIR
     TGTDIR=${TGTDIR%%[[:space:]]##}
+    expand_tilde TGTDIR
     if [[ -z $TGTDIR ]]; then
         print "No directory, installation cancelled."
         exit 1
@@ -342,8 +351,10 @@ do_install() {
     d=$(print -rD -- $TGTDIR)
     print "\nDirectory for installing executable scripts"
     vared -p "--> " TGTDIR
+    TGTDIR=${TGTDIR%%[[:space:]]##}
+    expand_tilde TGTDIR
     if [[ ! -d ${TGTDIR} ]]; then
-        print -D "Directory $TGTDIR does not exist, scripts not installed."
+        print -D "Directory" $TGTDIR "does not exist, scripts not installed."
     else
         local f scriptfiles
         scriptfiles=( ${BASEDIR}/bin/*(-*N) )
@@ -356,7 +367,7 @@ do_install() {
         fi
         d=( ${^path}(Ne:'[[ $REPLY -ef $TGTDIR ]]':) )
         if [[ -z $d ]]; then
-            print -D "Warning: $TGTDIR is not in the PATH."
+            print -D "Warning:" $TGTDIR "is not in the PATH."
         fi
     fi
     print
