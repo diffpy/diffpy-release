@@ -192,29 +192,29 @@ ListSkipOrDo() {
 
 do_update() {
     ListSkipOrDo update "src/libobjcryst" || (
-        cd $SRCDIR/libobjcryst
-        git fetch origin --tags
-        versiontags=( ${(f)"$(git tag --list 'v[[:digit:]]*')"} )
+        cd $SRCDIR/libobjcryst &&
+        git fetch origin --tags &&
+        versiontags=( ${(f)"$(git tag --list 'v[[:digit:]]*')"} ) &&
         git checkout ${versiontags[-1]}
-    )
+    ) || return $?
     ListSkipOrDo update "src/libdiffpy" || {
         cd $SRCDIR/libdiffpy && git pull origin
-    }
-    ListSkipOrDo update "src/diffpy.Structure" || (
+    } || return $?
+    ListSkipOrDo update "src/diffpy.Structure" || {
         cd $SRCDIR/diffpy.Structure && git pull origin
-    )
-    ListSkipOrDo update "src/diffpy.utils" || (
+    } || return $?
+    ListSkipOrDo update "src/diffpy.utils" || {
         cd $SRCDIR/diffpy.utils && git pull origin
-    )
-    ListSkipOrDo update "src/pyobjcryst" || (
+    } || return $?
+    ListSkipOrDo update "src/pyobjcryst" || {
         cd $SRCDIR/pyobjcryst && git pull origin
-    )
-    ListSkipOrDo update "src/diffpy.srreal" || (
+    } || return $?
+    ListSkipOrDo update "src/diffpy.srreal" || {
         cd $SRCDIR/diffpy.srreal && git pull origin
-    )
-    ListSkipOrDo update "src/diffpy.srfit" || (
+    } || return $?
+    ListSkipOrDo update "src/diffpy.srfit" || {
         cd $SRCDIR/diffpy.srfit && git pull origin
-    )
+    } || return $?
 }
 
 
@@ -242,45 +242,45 @@ do_build() {
     ListSkipOrDo build "PyCifRW" || {
         $EASY_INSTALL -N --zip-ok --prefix=$BASEDIR \
             ${SRCDIR}/pycifrw/PyCifRW-*.tar.gz(om[1])
-    }
+    } || return $?
     ListSkipOrDo build "diffpy.Structure" || {
         $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.Structure
-    }
+    } || return $?
     ListSkipOrDo build "diffpy.utils" || {
         $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.utils
-    }
+    } || return $?
     ListSkipOrDo build "periodictable" || {
         $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/periodictable
-    }
+    } || return $?
     ListSkipOrDo build "libObjCryst" || {
         cd $SRCDIR/libobjcryst
         $SCONS -j $NCPU build=fast prefix=$BASEDIR install
-    }
+    } || return $?
     ListSkipOrDo build "pyobjcryst" || {
         cd $SRCDIR/pyobjcryst
         $SCONS -j $NCPU prefix=$BASEDIR install
-    }
+    } || return $?
     ListSkipOrDo build "libdiffpy" || {
         cd $SRCDIR/libdiffpy
         $SCONS -j $NCPU enable_objcryst=yes prefix=$BASEDIR install
-    }
+    } || return $?
     ListSkipOrDo build "diffpy.srreal" || {
         cd $SRCDIR/diffpy.srreal
         $SCONS -j $NCPU prefix=$BASEDIR install
-    }
+    } || return $?
     ListSkipOrDo build "diffpy.srfit" || {
         $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.srfit
-    }
+    } || return $?
     ListSkipOrDo build "sans packages" || {
-        cd ${SRCDIR}/sans/data_util
+        cd ${SRCDIR}/sans/data_util &&
+        ${PYTHON} setup.py install --prefix=$BASEDIR &&
+        cd ${SRCDIR}/sans/sansdataloader &&
+        ${PYTHON} setup.py install --prefix=$BASEDIR &&
+        cd ${SRCDIR}/sans/sansmodels &&
+        ${PYTHON} setup.py install --prefix=$BASEDIR &&
+        cd ${SRCDIR}/sans/pr_inversion &&
         ${PYTHON} setup.py install --prefix=$BASEDIR
-        cd ${SRCDIR}/sans/sansdataloader
-        ${PYTHON} setup.py install --prefix=$BASEDIR
-        cd ${SRCDIR}/sans/sansmodels
-        ${PYTHON} setup.py install --prefix=$BASEDIR
-        cd ${SRCDIR}/sans/pr_inversion
-        ${PYTHON} setup.py install --prefix=$BASEDIR
-    }
+    } || return $?
 }
 
 
@@ -382,16 +382,12 @@ do_install() {
 
 if [[ -n ${opt_update} ]]; then
     expand_ranges update_selection ${${opt_update##--update=#}:-all}
-    setopt err_exit
-    do_update
-    setopt noerr_exit
+    do_update || exit $?
 fi
 
 if [[ -n ${opt_build} ]]; then
     expand_ranges build_selection ${${opt_build##--build=#}:-all}
-    setopt err_exit
-    do_build
-    setopt noerr_exit
+    do_build || exit $?
 fi
 
 if [[ -z "${opt_update}${opt_build}" ]]; then
