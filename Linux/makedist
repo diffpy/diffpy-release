@@ -1,0 +1,405 @@
+#!/bin/zsh -f
+
+setopt extendedglob
+setopt err_exit
+umask 022
+
+DOC="\
+${0:t} create binary or source bundle for the diffpy_cmi release.
+usage: ${0:t} [options] [all] [N] [N1-N2]
+
+With no arguments all build steps are performed in sequence.  Otherwise
+perform only steps given as arguments, where each argument is either a
+single package number or an inclusive range of indices FIRST-LAST.
+Use option --list to display all steps.
+
+Options:
+
+  -l, --list    show a numbered list of packages and exit
+  --source      create a source-only package
+  --clean       remove all generated files except downloads
+  -h, --help    display this message and exit
+
+The following environment variables override script defaults:
+
+  PYTHON        python executable used for the build [python]
+  EASY_INSTALL  easy_install program used for the build [easy_install]
+  SCONS         SCons program used for the build [scons]
+  TAR           tar command used for packaging [tar or gnutar]
+  NCPU          number of CPUs used in parallel builds [all-cores].
+  PREFIX        base directory for installing the binaries [.]
+"
+
+DOC=${${DOC##[[:space:]]##}%%[[:space:]]##}
+MYDIR=${0:A:h}
+BASEDIR=${MYDIR}
+PKGNAME=diffpy_cmi
+
+# Upstream code repositories -------------------------------------------------
+
+## edit URLs in this section to follow upstream updates.
+
+# git repositories for the sources in order of
+# (project, URL, branch[:TagOrHash])
+gitrepos=(
+    diffpy.Structure
+        https://github.com/diffpy/diffpy.Structure.git
+        master:2a4d253
+    diffpy.utils
+        https://github.com/diffpy/diffpy.utils.git
+        master:9b5f351
+    pyobjcryst
+        https://github.com/diffpy/pyobjcryst.git
+        master:075dbe9
+    periodictable
+        https://github.com/pkienzle/periodictable.git
+        master:v1.4.1
+    cxxtest
+        https://github.com/CxxTest/cxxtest.git
+        master:4.3
+    libdiffpy
+        https://github.com/diffpy/libdiffpy.git
+        master:v1.2a0
+    libobjcryst
+        https://github.com/diffpy/libobjcryst.git
+        master:v1.9.8b
+    diffpy.srreal
+        https://github.com/diffpy/diffpy.srreal.git
+        master:c4fd5c2
+    diffpy.srfit
+        https://github.com/diffpy/diffpy.srfit.git
+        master:82b26db
+)
+
+# Mercurial repositories for the sources in order of
+# (project, URL, branch[:TagOrHash])
+hgrepos=(
+)
+
+# URLs to source code bundles as (directory, URL)
+tarballs=(
+    pycifrw
+        https://bitbucket.org/jamesrhester/pycifrw/downloads/PyCifRW-3.6.1.tar.gz
+)
+
+# Subversion repositories as (targetpath, URL)
+svnrepos=(
+    sans/data_util
+        svn://svn@danse.us/common/releases/util-1.0.0@1501
+    sans/sansdataloader
+        svn://svn@danse.us/sans/releases/sansdataloader-1.0.0@5489
+    sans/sansmodels
+        svn://svn@danse.us/sans/releases/sansmodels-1.0.0@5489
+    sans/pr_inversion
+        svn://svn@danse.us/sans/releases/pr_inversion-1.0.0@5489
+)
+
+# Parse command-line options -------------------------------------------------
+
+zmodload zsh/zutil
+zparseopts -K -E -D \
+    h=opt_help -help=opt_help l=opt_list -list=opt_list \
+    -clean=opt_clean -source=opt_source
+
+if [[ -n ${opt_help} ]]; then
+    print -r -- $DOC
+    exit
+fi
+
+typeset -aU selection
+for n; do
+    if [[ $n == [[:digit:]]##-[[:digit:]]## ]]; then
+        selection=( $selection {${n%%-*}..${n##*-}} )
+    elif [[ $n == [[:digit:]]## ]]; then
+        selection=( $selection $n )
+    elif [[ $n == all ]]; then
+        selection=( {1..100} )
+    else
+        print -u2 "Invalid option or argument '$n'."
+        exit 2
+    fi
+done
+
+if [[ -z ${opt_clean} && -z ${selection} ]]; then
+    selection=( {1..100} )
+fi
+
+# Resolve parameters that can be overloaded from the environment -------------
+
+: ${PREFIX:=${BASEDIR}}
+: ${PYTHON:==python}
+: ${EASY_INSTALL:==easy_install}
+: ${SCONS:==scons}
+: ${NCPU:=$(${PYTHON} -c \
+    'from multiprocessing import cpu_count; print cpu_count()')}
+if [[ -z $TAR ]]; then
+    TAR=tar
+    if [[ $OSTYPE == darwin* ]]; then
+        TAR=gnutar
+    fi
+fi
+
+# Determine other parameters -------------------------------------------------
+
+cd $BASEDIR
+
+SRCDIR=${BASEDIR}/src
+INCLUDEDIR=${PREFIX}/include
+LIBDIR=${PREFIX}/lib
+PYTHON_VERSION=$($PYTHON -c 'import sys; print "%s.%s" % sys.version_info[:2]')
+PYTHONDIR=$LIBDIR/python${PYTHON_VERSION}/site-packages
+VERSION=${"$(git describe --match='v[[:digit:]]*')"#v}
+VERSION_SHORT=${VERSION%-g[[:xdigit:]]##}
+
+if [[ -z $opt_source ]]; then
+    SUFFIX=-py${PYTHON_VERSION}-${(L)$(uname -s)}-${CPUTYPE}
+fi
+
+PACKAGE=dist/${PKGNAME}-${VERSION_SHORT}${SUFFIX}
+
+# Adjust environment variables used in the build -----------------------------
+
+export LIBRARY_PATH=$LIBDIR:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$LIBDIR:$LD_LIBRARY_PATH
+export CPATH=$INCLUDEDIR:$CPATH
+export PYTHONPATH=$PYTHONDIR:$PYTHONPATH
+
+# Define functions used in build steps ---------------------------------------
+
+integer BIDX=0
+
+ListSkipOrBuild() {
+    local name=${1?}
+    if [[ $2 == binary && -n $opt_source ]]; then
+        return 0
+    fi
+    (( ++BIDX ))
+    if [[ -z ${(M)selection:#${BIDX}} ]]; then
+        return 0
+    fi
+    if [[ -n ${opt_list} ]]; then
+        print $BIDX $name
+        return 0
+    fi
+    local dashline="# $BIDX $name ${(l:80::-:):-}"
+    print ${dashline[1,78]}
+    # return false status to trigger the build section
+    return 1
+}
+
+
+fetchgitrepository() {
+    [[ $# == 3 ]] || exit $?
+    local tgtdir=$1 url=$2 branch=${3%%:*}
+    local tag=${${3#${branch}}##*:}
+    if [[ ! -d $tgtdir ]]; then
+        git clone -b $branch $url $tgtdir
+    else (
+        cd $tgtdir &&
+        git checkout $branch &&
+        git pull --tags origin $branch
+        )
+    fi
+    if [[ -n $tag ]]; then (
+        cd $tgtdir
+        if [[ -z "$(git log -1 $branch..$tag)" ]]; then
+            git reset --hard $tag
+        else
+            git checkout --quiet $tag
+        fi
+        )
+    fi
+}
+
+
+fetchhgrepository() {
+    [[ $# == 3 ]] || exit $?
+    local tgtdir=$1 url=$2 branch=${3%%:*}
+    local tag=${${3#${branch}}##*:}
+    if [[ ! -d $tgtdir ]]; then
+        hg clone -b $branch $url $tgtdir
+    else
+        ( cd $tgtdir && hg pull -u -b $branch )
+    fi
+    if [[ -n $tag ]]; then
+        ( cd $tgtdir && hg update $tag )
+    fi
+}
+
+
+fetchsvnrepository() {
+    [[ $# == 2 ]] || exit $?
+    local tgtdir=$1 url=$2
+    svn checkout $url $tgtdir
+}
+
+
+fetchtarball() {
+    [[ $# == 2 ]] || exit $?
+    local tgtdir=$1 url=$2
+    local wget_opts
+    wget_opts=( --timestamping --no-verbose )
+    if [[ -d /opt/local/share/curl ]]; then
+        wget_opts+=( --ca-directory=/opt/local/share/curl )
+    fi
+    mkdir -p $tgtdir
+    ( cd $tgtdir && wget $wget_opts $url )
+}
+
+# Build commands here --------------------------------------------------------
+
+if [[ -n $opt_clean ]]; then
+    cd $BASEDIR
+    print "# Cleaning all generated files except of source downloads."
+    # Clean any generated files except the src directory
+    git clean -fdx --exclude=src
+
+    # clean up all git repositories
+    for gd in src/*/.git(N:h); (
+        cd $gd && git clean -fdx
+    )
+
+    # clean up all subversion repositories
+    for sd in src/*/.svn(/N:h) src/*/*/.svn(/N:h); (
+        cd $sd
+        junkfiles=( ${(f)"$(svn status --no-ignore | grep '^[?I]' | cut -b9-)"} )
+        rm -vrf $junkfiles
+    )
+fi
+
+
+if [[ -z ${opt_list} && -n $selection ]]; then
+    mkdir -p $INCLUDEDIR $LIBDIR $PYTHONDIR
+fi
+
+
+ListSkipOrBuild "download upstream sources" || (
+    mkdir -p $SRCDIR
+    cd $SRCDIR
+    for t u b in $gitrepos;  fetchgitrepository $t $u $b
+    for t u b in $hgrepos;  fetchhgrepository $t $u $b
+    for t u in $svnrepos;  fetchsvnrepository $t $u
+    for t u in $tarballs;  fetchtarball $t $u
+)
+
+ListSkipOrBuild "copy src-addons to the source tree" || {
+    rsync -av ${BASEDIR}/src-addons/ ${SRCDIR}/
+}
+
+ListSkipOrBuild "update version files" || {
+    print -r "$VERSION" >| ${BASEDIR}/VERSION.txt
+    cd $SRCDIR
+    for f in $(grep -l version.cfg */setup.py(N) /dev/null); (
+        cd ${f:h}
+        python setup.py egg_info
+    )
+}
+
+ListSkipOrBuild pycifrw binary || {
+    $EASY_INSTALL -N --zip-ok --prefix=$PREFIX \
+        ${SRCDIR}/pycifrw/PyCifRW-*.tar.gz(om[1])
+}
+
+ListSkipOrBuild diffpy.Structure binary || {
+    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.Structure
+}
+
+ListSkipOrBuild diffpy.utils binary || {
+    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.utils
+}
+
+ListSkipOrBuild periodictable binary || {
+    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/periodictable
+}
+
+ListSkipOrBuild libObjCryst binary || {
+    cd $SRCDIR/libobjcryst
+    $SCONS -j $NCPU build=fast prefix=$PREFIX install
+}
+
+ListSkipOrBuild pyobjcryst binary || {
+    cd $SRCDIR/pyobjcryst
+    $SCONS -j $NCPU build=fast prefix=$PREFIX install
+}
+
+ListSkipOrBuild libdiffpy binary || {
+    cd $SRCDIR/libdiffpy
+    $SCONS -j $NCPU build=fast enable_objcryst=yes test
+    $SCONS -j $NCPU build=fast enable_objcryst=yes prefix=$PREFIX install
+}
+
+ListSkipOrBuild diffpy.srreal binary || {
+    cd $SRCDIR/diffpy.srreal
+    $SCONS -j $NCPU build=fast prefix=$PREFIX install
+}
+
+ListSkipOrBuild sans/data_util binary || {
+    cd ${SRCDIR}/sans/data_util
+    ${PYTHON} setup.py install --prefix=$PREFIX
+}
+
+ListSkipOrBuild sans/sansdataloader binary || {
+    cd ${SRCDIR}/sans/sansdataloader
+    ${PYTHON} setup.py install --prefix=$PREFIX
+}
+
+ListSkipOrBuild sans/sansmodels binary || {
+    cd ${SRCDIR}/sans/sansmodels
+    ${PYTHON} setup.py install --prefix=$PREFIX
+}
+
+ListSkipOrBuild sans/pr_inversion binary || {
+    cd ${SRCDIR}/sans/pr_inversion
+    ${PYTHON} setup.py install --prefix=$PREFIX
+}
+
+ListSkipOrBuild diffpy.srfit binary || {
+    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
+}
+
+# Skip when building on Mac OS X
+[[ $OSTYPE == darwin* ]] ||
+ListSkipOrBuild "copy boost libraries" binary || {
+    typeset -aU boostdeplibs
+    for f in $LIBDIR/**/*.so(*N); do
+        boostdeplibs+=(
+            $(ldd $f | awk '$1 ~ /^libboost_/ && $2 == "=>" {print $3}')
+        )
+    done
+    if [[ -n ${boostdeplibs} ]]; then
+        rsync -a ${boostdeplibs} $LIBDIR/
+    fi
+    cd $LIBDIR
+    for bp in ${boostdeplibs:t}; do
+        tgt=${bp%.so*}.so
+        [[ $bp -ef $tgt ]] || ln -sv ${bp} $tgt
+    done
+}
+
+ListSkipOrBuild "create diffpy_cmi tarball" || {
+    cd $BASEDIR
+    mkdir -p ${PACKAGE}
+    excludes=(
+        # exclude intermediate build files
+        build dist temp '.sconsign.*' .sconf_temp '*.pyc'
+        # remove subversion files in the packaged tree
+        .svn
+    )
+    sourcepaths=(
+        install src *.pth *.sh *.txt
+    )
+    if [[ -z ${opt_source} ]]; then
+        sourcepaths+=( bin(N) share include lib )
+    fi
+    rsync -av --delete --link-dest=$BASEDIR \
+        --exclude=$PACKAGE --exclude=${^excludes} \
+        ${sourcepaths?} $PACKAGE/
+    # finally create the tar bundle
+    $TAR czf ${PACKAGE}.tar.gz \
+        --directory ${PACKAGE:h} \
+        --numeric-owner --owner=0 --group=0 ${PACKAGE:t}
+}
+
+ListSkipOrBuild "clean the temporary package tree" || {
+    rm -rf $PACKAGE
+}

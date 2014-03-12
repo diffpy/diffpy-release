@@ -3,6 +3,6 @@
 Import('env')
 
 # Set RPATH to find the libObjCryst.so in the parent lib directory.
-env.AppendUnique(LINKFLAGS="-Wl,-rpath='$$ORIGIN/../../../..'")
+env.AppendUnique(LINKFLAGS="-Wl,-rpath,'$$ORIGIN/../../../..'")
 
 # vim: ft=python

@@ -3,6 +3,9 @@
 /Linux/lib/
 /Linux/share/
 /Linux/src/
+/Linux/dist/
+/Linux/.license.agreed
+/Linux/VERSION.txt
 /MacOSX/ports/PortIndex
 /MacOSX/ports/PortIndex.quick
 *.swp
