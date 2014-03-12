@@ -303,10 +303,11 @@ do_install() {
         fi
         expand_ranges build_selection all
         do_build || {
+            print "\n$HASHLINE"
             print "Build failure, installation cancelled."
+            print "$HASHLINE"
             print
-            print "Check if required software is installed and try again with"
-            print "./install --build"
+            print "Check if all required software is installed and try again."
             exit 2
         }
         if [[ -z ${opt_dryrun} ]]; then
