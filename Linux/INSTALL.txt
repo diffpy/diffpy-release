@@ -1,23 +1,30 @@
-(1) Install the required system packages using:
+(1) Install the required dependencies from the command line by using a suitable package manager.
 
-    sudo apt-get install \
-        libgsl0-dev \
-        libboost-all-dev \
-        python-dev \
-        python-setuptools \
-        python-numpy \
-        python-scipy \
-        python-matplotlib \
-        python-lxml \
-        ipython \
+	For Ubuntu use apt-get:
 
-    This works on Ubuntu Linux or other Debian-based distributions.
-    Other Linux distributions may use different software manager,
-    but the package names should be equal or very similar to those
-    above.
+	sudo apt-get install \
+    	libgsl0-dev libboost-all-dev python-dev \
+    	python-setuptools python-numpy python-scipy \
+    	python-matplotlib python-lxml ipython \
+    	scons git zsh
+	
+	For Fedora use yum:
 
+	sudo yum install \
+    	gsl-devel boost-devel python-devel
+    	python-setuptools numpy scipy  \
+    	python-matplotlib python-lxml \
+    	python-ipython-notebook scons git zsh
 
-(2) For a one-user installation determine the Python directory for user
+(2) To install diffpy-cmi, run
+
+    ./install
+    
+    You should first view and agree the license agreement. Then you can 
+    choose the Python directory to install. 
+
+	If you prefer to install it manually, follow the instructions below. 
+    For a one-user installation determine the Python directory for user
     files, create it if it does not exist yet, and add there a symbolic
     link to the diffpy_cmi.pth file:
 
@@ -33,47 +40,19 @@
     Note it is essential to use the symbolic link.  Making a copy of the
     pth file would not work.
 
-
 (3) Test the installation with
 
     ./runtests.sh
 
 (4, optional) update and rebuild:
 
-    Install the required system packages using:
-
-    apt-get install \
-        git libboost-all-dev libgsl0-dev mercurial python-dev \
-        python-numpy python-setuptools scons wget zsh
-
-    This works on Ubuntu Linux or other Debian-based distributions.
-    Other Linux distributions may use different software manager,
-    but the package names should be equal or very similar to those
-    above.
-
-    After installing all packages you can try to download and build
-    the code with
-
-    ./update.zsh
-
-    This will first clean pervious build, fetch the latest source code,
-    and build all packages in place. Then you can run the test again to
-    test the new build.
-
-Note:
-    If you experience some errors in runtests.sh such as
-
-        undefined symbol: PyUnicodeUCS4_FromEncodedObject
-
-    or
-
-        undefined symbol: PyUnicodeUCS2_FromEncodedObject
-
-    It is usually because the python you are using is not compatible with
-    the prebuild boostpython library. (For example you are using Enthought
-    Python Distribution.) You can try to rebuild the whole diffpy
-    projects with:
-
-    ./update.zsh
-
-    This will rebuild the boost library used in diffpy projects.
+    ./install --update[=steps]  
+    
+    perform all or selected software updates from online source repositories.  
+    Update steps are comma separated integers or ranges such as '1,3,5-6'.  
+    Use option -n to display the steps.
+    
+    ./install --build[=steps]   
+    
+    rebuild all or specified packages from sources in the src folder.  Use 
+    option -n to display the build steps.
