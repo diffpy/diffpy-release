@@ -46,7 +46,7 @@ Options:
 "
 DOC=${${DOC##[[:space:]]##}%%[[:space:]]##}
 
-BASEDIR=${0:A:h}
+BASEDIR=$(cd ${0:h} && pwd -P)
 SRCDIR=${BASEDIR}/src
 PTHFILE=${BASEDIR}/diffpy_cmi.pth
 VERSION=$(cd $BASEDIR && test -s VERSION.txt && <VERSION.txt)
