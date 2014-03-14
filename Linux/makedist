@@ -128,7 +128,7 @@ fi
 : ${PYTHON:==python}
 : ${SCONS:==scons}
 : ${NCPU:=$(${PYTHON} -c \
-    'from multiprocessing import cpu_count; print cpu_count()')}
+    'from multiprocessing import cpu_count; print max(4, cpu_count())')}
 if [[ -z $TAR ]]; then
     TAR=tar
     if [[ $OSTYPE == darwin* ]]; then

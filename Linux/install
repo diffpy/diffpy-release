@@ -239,7 +239,7 @@ do_build() {
     PYTHON_VERSION=$($PYTHON -c 'import sys; print "%s.%s" % sys.version_info[:2]')
     PYTHONDIR=$LIBDIR/python${PYTHON_VERSION}/site-packages
     : ${NCPU:=$(${PYTHON} -c \
-        'from multiprocessing import cpu_count; print cpu_count()')}
+        'from multiprocessing import cpu_count; print max(4, cpu_count())')}
 
     export PATH=${BASEDIR}/bin:$PATH
     export LIBRARY_PATH=${BASEDIR}/lib:$LIBRARY_PATH
