@@ -23,7 +23,6 @@ Options:
 The following environment variables override script defaults:
 
   PYTHON        python executable used for the build [python]
-  EASY_INSTALL  easy_install program used for the build [easy_install]
   SCONS         SCons program used for the build [scons]
   TAR           tar command used for packaging [tar or gnutar]
   NCPU          number of CPUs used in parallel builds [all-cores].
@@ -128,7 +127,6 @@ fi
 
 : ${PREFIX:=${BASEDIR}}
 : ${PYTHON:==python}
-: ${EASY_INSTALL:==easy_install}
 : ${SCONS:==scons}
 : ${NCPU:=$(${PYTHON} -c \
     'from multiprocessing import cpu_count; print cpu_count()')}
@@ -246,6 +244,17 @@ fetchtarball() {
     ( cd $tgtdir && wget $wget_opts $url )
 }
 
+
+python_easy_install() {
+    local eicode='if True:
+        import sys
+        from setuptools.command.easy_install import main
+        sys.argv[0] = "easy_install"
+        main()
+    '
+    ${PYTHON} -c "$eicode" "$@"
+}
+
 # Build commands here --------------------------------------------------------
 
 if [[ -n $opt_clean ]]; then
@@ -296,20 +305,20 @@ ListSkipOrBuild "update version files" || {
 }
 
 ListSkipOrBuild pycifrw binary || {
-    $EASY_INSTALL -N --zip-ok --prefix=$PREFIX \
+    python_easy_install -N --zip-ok --prefix=$PREFIX \
         ${SRCDIR}/pycifrw/PyCifRW-*.tar.gz(om[1])
 }
 
 ListSkipOrBuild diffpy.Structure binary || {
-    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.Structure
+    python_easy_install -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.Structure
 }
 
 ListSkipOrBuild diffpy.utils binary || {
-    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.utils
+    python_easy_install -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.utils
 }
 
 ListSkipOrBuild periodictable binary || {
-    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/periodictable
+    python_easy_install -ZN --prefix=$PREFIX ${SRCDIR}/periodictable
 }
 
 ListSkipOrBuild libObjCryst binary || {
@@ -354,7 +363,7 @@ ListSkipOrBuild sans/pr_inversion binary || {
 }
 
 ListSkipOrBuild diffpy.srfit binary || {
-    $EASY_INSTALL -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
+    python_easy_install -ZN --prefix=$PREFIX ${SRCDIR}/diffpy.srfit
 }
 
 # Skip when building on Mac OS X

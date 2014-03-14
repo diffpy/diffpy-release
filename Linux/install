@@ -57,7 +57,6 @@ SRCDIR=${BASEDIR}/src
 PTHFILE=${BASEDIR}/diffpy_cmi.pth
 VERSION=$(cd $BASEDIR && test -s VERSION.txt && <VERSION.txt)
 
-: ${EASY_INSTALL:=easy_install}
 typeset -aU build_selection update_selection
 build_selection=( )
 update_selection=( )
@@ -153,6 +152,17 @@ do_license() {
 }
 
 
+python_easy_install() {
+    local eicode='if True:
+        import sys
+        from setuptools.command.easy_install import main
+        sys.argv[0] = "easy_install"
+        main()
+    '
+    ${PYTHON} -c "$eicode" "$@"
+}
+
+
 integer UIDX=0
 integer BIDX=0
 
@@ -242,17 +252,17 @@ do_build() {
     fi
 
     ListSkipOrDo build "PyCifRW" || {
-        $EASY_INSTALL -N --zip-ok --prefix=$BASEDIR \
+        python_easy_install -N --zip-ok --prefix=$BASEDIR \
             ${SRCDIR}/pycifrw/PyCifRW-*.tar.gz(om[1])
     } || return $?
     ListSkipOrDo build "diffpy.Structure" || {
-        $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.Structure
+        python_easy_install -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.Structure
     } || return $?
     ListSkipOrDo build "diffpy.utils" || {
-        $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.utils
+        python_easy_install -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.utils
     } || return $?
     ListSkipOrDo build "periodictable" || {
-        $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/periodictable
+        python_easy_install -ZN --prefix=$BASEDIR ${SRCDIR}/periodictable
     } || return $?
     ListSkipOrDo build "libObjCryst" || {
         cd $SRCDIR/libobjcryst
@@ -271,7 +281,7 @@ do_build() {
         $SCONS -j $NCPU prefix=$BASEDIR install
     } || return $?
     ListSkipOrDo build "diffpy.srfit" || {
-        $EASY_INSTALL -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.srfit
+        python_easy_install -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.srfit
     } || return $?
     ListSkipOrDo build "sans packages" || {
         cd ${SRCDIR}/sans/data_util &&
