@@ -381,7 +381,7 @@ ListSkipOrBuild "create diffpy_cmi tarball" || {
     mkdir -p ${PACKAGE}
     excludes=(
         # exclude intermediate build files
-        build dist temp '.sconsign.*' .sconf_temp '*.pyc'
+        build dist temp '.sconsign.*' .sconf_temp config.log '*.pyc'
         # remove subversion files in the packaged tree
         .svn
     )
