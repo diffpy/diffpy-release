@@ -393,6 +393,8 @@ ListSkipOrBuild "create diffpy_cmi tarball" || {
         build dist temp '.sconsign.*' .sconf_temp config.log '*.pyc'
         # remove subversion files in the packaged tree
         .svn
+        # Use cxxtest at a fixed git-tag version
+        src/cxxtest/.git
     )
     sourcepaths=(
         install src *.pth *.sh *.txt
