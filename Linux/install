@@ -1,6 +1,28 @@
 #!/bin/sh
 # vim: ft=zsh
 
+DOC="
+DiffPy-CMI installation utility
+usage: ./install [options]
+
+Options:
+
+  -n, --dry-run   list what would be done without making any changes.
+                  Display a list of steps when run with --build or --update.
+  --update[=steps]  perform all or selected software updates from online
+                  source repositories.  Update steps are comma separated
+                  integers or ranges such as '1,3,5-6'.  Use option -n to
+                  display the steps.
+  --build[=steps]   rebuild all or specified packages from sources in the
+                  src folder.  Use option -n to display the build steps.
+  -h, --help      display this message and exit
+"
+
+# Environment overridable variables
+
+: ${PYTHON:=python}     # python executable to install for
+: ${SCONS:=scons}       # path to scons, the software building tool
+
 # Re-launch using zsh --------------------------------------------------------
 
 if test -z "$ZSH_VERSION"; then
@@ -28,22 +50,6 @@ setopt extendedglob
 
 # Constants ------------------------------------------------------------------
 
-DOC="\
-DiffPy-CMI installation utility
-usage: ./${0:t} [options]
-
-Options:
-
-  -n, --dry-run   list what would be done without making any changes.
-                  Display a list of steps when run with --build or --update.
-  --update[=steps]  perform all or selected software updates from online
-                  source repositories.  Update steps are comma separated
-                  integers or ranges such as '1,3,5-6'.  Use option -n to
-                  display the steps.
-  --build[=steps]   rebuild all or specified packages from sources in the
-                  src folder.  Use option -n to display the build steps.
-  -h, --help      display this message and exit
-"
 DOC=${${DOC##[[:space:]]##}%%[[:space:]]##}
 
 BASEDIR=$(cd ${0:h} && pwd -P)
@@ -51,11 +57,7 @@ SRCDIR=${BASEDIR}/src
 PTHFILE=${BASEDIR}/diffpy_cmi.pth
 VERSION=$(cd $BASEDIR && test -s VERSION.txt && <VERSION.txt)
 
-# Environment overridable variables
-: ${PYTHON:=python}
 : ${EASY_INSTALL:=easy_install}
-: ${SCONS:=scons}
-
 typeset -aU build_selection update_selection
 build_selection=( )
 update_selection=( )
