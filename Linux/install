@@ -262,7 +262,8 @@ do_build() {
         python_easy_install -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.utils
     } || return $?
     ListSkipOrDo build "periodictable" || {
-        python_easy_install -ZN --prefix=$BASEDIR ${SRCDIR}/periodictable
+        python_easy_install -ZN --prefix=$BASEDIR \
+            ${SRCDIR}/periodictable/periodictable-*.tar.gz(om[1])
     } || return $?
     ListSkipOrDo build "libObjCryst" || {
         cd $SRCDIR/libobjcryst

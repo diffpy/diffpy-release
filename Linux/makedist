@@ -50,9 +50,6 @@ gitrepos=(
     pyobjcryst
         https://github.com/diffpy/pyobjcryst.git
         master:075dbe9
-    periodictable
-        https://github.com/pkienzle/periodictable.git
-        master:v1.4.1
     cxxtest
         https://github.com/CxxTest/cxxtest.git
         master:4.3
@@ -79,6 +76,8 @@ hgrepos=(
 tarballs=(
     pycifrw
         https://bitbucket.org/jamesrhester/pycifrw/downloads/PyCifRW-3.6.1.tar.gz
+    periodictable
+        https://pypi.python.org/packages/source/p/periodictable/periodictable-1.4.1.tar.gz
 )
 
 # Subversion repositories as (targetpath, URL)
@@ -318,7 +317,8 @@ ListSkipOrBuild diffpy.utils binary || {
 }
 
 ListSkipOrBuild periodictable binary || {
-    python_easy_install -ZN --prefix=$PREFIX ${SRCDIR}/periodictable
+    python_easy_install -ZN --prefix=$PREFIX \
+        ${SRCDIR}/periodictable/periodictable-*.tar.gz(om[1])
 }
 
 ListSkipOrBuild libObjCryst binary || {
