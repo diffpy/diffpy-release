@@ -270,7 +270,7 @@ do_build() {
     } || return $?
     ListSkipOrDo build "pyobjcryst" || {
         cd $SRCDIR/pyobjcryst
-        $SCONS -j $NCPU prefix=$BASEDIR install
+        $SCONS -j $NCPU prefix=$BASEDIR python=$PYTHON install
     } || return $?
     ListSkipOrDo build "libdiffpy" || {
         cd $SRCDIR/libdiffpy
@@ -278,7 +278,7 @@ do_build() {
     } || return $?
     ListSkipOrDo build "diffpy.srreal" || {
         cd $SRCDIR/diffpy.srreal
-        $SCONS -j $NCPU prefix=$BASEDIR install
+        $SCONS -j $NCPU prefix=$BASEDIR python=$PYTHON install
     } || return $?
     ListSkipOrDo build "diffpy.srfit" || {
         python_easy_install -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.srfit
