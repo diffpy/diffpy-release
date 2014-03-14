@@ -18,6 +18,7 @@ Options:
   -l, --list    show a numbered list of packages and exit
   --source      create a source-only package
   --clean       remove all generated files except downloads
+  --wipe        do --clean and also remove all downloads and dist files
   -h, --help    display this message and exit
 
 The following environment variables override script defaults:
@@ -97,11 +98,15 @@ svnrepos=(
 zmodload zsh/zutil
 zparseopts -K -E -D \
     h=opt_help -help=opt_help l=opt_list -list=opt_list \
-    -clean=opt_clean -source=opt_source
+    -clean=opt_clean -wipe=opt_wipe -source=opt_source
 
 if [[ -n ${opt_help} ]]; then
     print -r -- $DOC
     exit
+fi
+
+if [[ -n ${opt_wipe} ]]; then
+    opt_clean=1
 fi
 
 typeset -aU selection
@@ -258,8 +263,14 @@ python_easy_install() {
 
 if [[ -n $opt_clean ]]; then
     cd $BASEDIR
-    print "# Cleaning all generated files except of source downloads."
+    if [[ -n $opt_wipe ]]; then
+        print "# Cleaning all downloads and generated files."
+        rm -rf ${BASEDIR}/src
+    else
+        print "# Cleaning all generated files except of source downloads."
+    fi
     # Clean any generated files except the src directory
+    rm -rf ${BASEDIR}/dist
     git clean -fdx --exclude=src
 
     # clean up all git repositories
