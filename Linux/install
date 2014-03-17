@@ -309,7 +309,10 @@ do_install() {
     if [[ ${#libfiles} -lt 2 ]]; then
         print
         print "Source only-distribution - we need to re-build all packages."
-        read -q '?Proceed? (y/n) '; print
+        REPLY=Y
+        if [[ -z $opt_dryrun ]]; then
+            read -q '?Proceed? (y/n) '; print
+        fi
         if [[ $REPLY != [yY] ]]; then
             print "Installation cancelled."
             exit 1
