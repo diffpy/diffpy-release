@@ -1,58 +1,100 @@
-(1) Install the required dependencies from the command line by using a suitable package manager.
+DIFFPY-CMI
 
-	For Ubuntu use apt-get:
+Software framework for complex modeling of structures from diffraction data
 
-	sudo apt-get install \
-    	libgsl0-dev libboost-all-dev python-dev \
-    	python-setuptools python-numpy python-scipy \
-    	python-matplotlib python-lxml ipython \
-    	scons git zsh
-	
-	For Fedora use yum:
+This release includes Python and C++ modules developed by the DiffPy team
+and the required external software dependencies.
 
-	sudo yum install \
-    	gsl-devel boost-devel python-devel
-    	python-setuptools numpy scipy  \
-    	python-matplotlib python-lxml \
-    	python-ipython-notebook scons git zsh
+Python Libraries:
 
-(2) To install diffpy-cmi, run
+* diffpy.srfit -- setup, control and evaluation of multi-contribution fits.
+* diffpy.srreal -- calculators for pair-interaction quantities such as pair
+  distribution function (PDF), bond lengths, and bond valence sums (BVS).
+* diffpy.Structure -- storage and manipulation of crystal structure data
+  and space group symmetry utilities.
+* diffpy.utils -- shared utilities such as parsing of text data files.
+* pyobjcryst -- Python bindings to the ObjCryst++ Object-Oriented
+  Crystallographic Library
+* PyCifRW -- support for CIF (Crystallographic Information Format) files
+* periodictable -- access to the periodic table of elements data in Python
 
-    ./install
-    
-    You should first view and agree the license agreement. Then you can 
-    choose the Python directory to install. 
+C++ Libraries:
 
-	If you prefer to install it manually, follow the instructions below. 
-    For a one-user installation determine the Python directory for user
-    files, create it if it does not exist yet, and add there a symbolic
-    link to the diffpy_cmi.pth file:
+* libdiffpy -- calculation of PDF, BVS and other pair-interaction quantities.
+* libobjcryst -- ObjCryst++ Object-Oriented Crystallographic Library packaged
+  for installation as a shared library.
+* CxxTest -- testing framework for C++ codes.
 
-    D="$(python -c 'import site; print site.USER_SITE')"
-    mkdir -p "$D"
-    ln -si $PWD/diffpy_cmi.pth "$D"/
 
-    For a system-wide installation create symbolic link in the directory
-    for system-wide Python packages:
+REQUIREMENTS
 
-    sudo ln -si $PWD/diffpy_cmi.pth /usr/local/lib/python2.7/dist-packages/
+Linux or Mac OS X with the following packages from system software manager:
 
-    Note it is essential to use the symbolic link.  Making a copy of the
-    pth file would not work.
+(a) Ubuntu or Debian Linux:
 
-(3) Test the installation with
+    sudo apt-get install \
+        libgsl0-dev libboost-all-dev python-dev python-setuptools \
+        python-numpy python-scipy python-matplotlib python-lxml ipython \
+        scons git zsh
+        
+(b) Fedora Linux:
 
-    ./runtests.sh
+    sudo yum install \
+        gsl-devel boost-devel python-devel python-setuptools \
+        numpy scipy  python-matplotlib python-lxml python-ipython-notebook \
+        scons git zsh
 
-(4, optional) update and rebuild:
+(c) Mac OS X with Mac Ports:
 
-    ./install --update[=steps]  
-    
-    perform all or selected software updates from online source repositories.  
-    Update steps are comma separated integers or ranges such as '1,3,5-6'.  
-    Use option -n to display the steps.
-    
-    ./install --build[=steps]   
-    
-    rebuild all or specified packages from sources in the src folder.  Use 
-    option -n to display the build steps.
+    sudo port install \
+        FIXME
+
+
+INSTALLATION
+
+Run "./install" in a terminal and follow the prompts.  When completed, run
+"./runtests.sh" to verify the installation.
+
+If you prefer to install manually, create symbolic link to the diffpy_cmi.pth
+file in some Python directory that processes .pth files.  Note it is essential
+to use the symbolic link, making a copy of the .pth file would not work.
+
+For a single-user installation the preferred pth directory can be found using
+
+    python -c 'import site; print site.USER_SITE'
+
+whereas for a system-wide installation the standard pth locations are
+
+    python -c 'import site; print site.getsitepackages()'
+
+
+UPGRADE
+
+DiffPy source packages included in this distribution can be updated to
+the latest versions from online source repositories by running
+
+    ./install --update[=steps]
+
+where the optional steps allow to do updates only for some rather
+than all source codes.  Use "./install -n --update" to display the
+list of steps without making any changes.
+
+The updated sources need to be re-compiled and activated using
+
+    ./install --build[=steps]
+
+Similarly as for the update action, "./install -n --build" displays
+the build steps without performing them.  Finally, use "./install --help"
+for a short summary of all options for the install script.
+
+
+CONTACTS
+
+If you need help with installing this software, please check discussions
+or post your question at https://groups.google.com/d/forum/diffpy-dev.
+
+For more information on DiffPy-CMI please visit the project web-page
+
+http://www.diffpy.org
+
+or email Prof. Simon Billinge at sb2896@columbia.edu.
