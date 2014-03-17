@@ -197,13 +197,13 @@ adjust_macosx_environment() {
     local cxxhasboost
     cxxhasboost=( ${^compilerpaths}/boost(N-/) )
     if [[ -z $cxxhasboost && -d ${PORTDIR}/include/boost ]]; then
-        print "Warning: Adjusting CPATH to include MacPorts header files."
+        print "WARNING: Adjusting CPATH to include MacPorts header files."
         cpath=( $PORTDIR/include $cpath )
         print -r "CPATH=${(q)CPATH}"
         print
         local plib=${PORTDIR}/lib
         if [[ -d $plib && -z ${(M)library_path:#${plib}} ]]; then
-            print "Warning: Adjusting LIBRARY_PATH to include MacPorts libraries."
+            print "WARNING: Adjusting LIBRARY_PATH to include MacPorts libraries."
             library_path=( $plib $library_path )
             print -r "LIBRARY_PATH=${(q)LIBRARY_PATH}"
             print
@@ -332,6 +332,75 @@ do_build() {
 }
 
 
+install_pthfile() {
+    local TGTDIR=$(print -lr \
+        'import site, distutils.sysconfig' \
+        'if site.ENABLE_USER_SITE:  print site.USER_SITE' \
+        'else:  print distutils.sysconfig.get_python_lib()' \
+        | ${PYTHON} )
+    print
+    print "Python path directory for installing ${PTHFILE:t}"
+    vared -p '--> ' TGTDIR
+    TGTDIR=${TGTDIR%%[[:space:]]##}
+    expand_tilde TGTDIR
+    if [[ -z $TGTDIR ]]; then
+        print "No directory, installation cancelled."
+        exit 1
+    fi
+    if [[ ! -d $TGTDIR ]]; then
+        print "Directory $TGTDIR does not exist."
+        read -q '?Create? (y/n) '; print
+        if [[ $REPLY == [yY] ]]; then
+            mkdir -p ${TGTDIR} || exit $?
+        else
+            print "No directory, installation cancelled."
+            exit 1
+        fi
+    fi
+    if [[ ${PTHFILE} -ef ${TGTDIR}/${PTHFILE:t} && -L ${TGTDIR}/${PTHFILE:t} ]];
+    then
+        print "Symbolic link to ${PTHFILE:t} already exists, good!"
+    else
+        print "Creating symbolic link"
+        ln -siv ${PTHFILE} ${TGTDIR} || exit $?
+    fi
+    print
+}
+
+
+install_scripts() {
+    local scriptfiles
+    scriptfiles=( ${BASEDIR}/bin/*(-*N) )
+    if [[ -z $scriptfiles ]]; then
+        return
+    fi
+    TGTDIR=${HOME}/bin
+    d=$(print -rD -- $TGTDIR)
+    print "Directory for installing executable scripts"
+    vared -p "--> " TGTDIR
+    TGTDIR=${TGTDIR%%[[:space:]]##}
+    expand_tilde TGTDIR
+    if [[ ! -d ${TGTDIR} ]]; then
+        print -D "Directory" $TGTDIR "does not exist, scripts not installed."
+        print
+        return
+    fi
+    # scrub scriptfiles that are already installed
+    scriptfiles=( ${^scriptfiles}(Ne,'[[ ! $REPLY -ef $TGTDIR/${REPLY:t} ]]',) )
+    if [[ -z ${scriptfiles} ]]; then
+        print "Scripts are already installed, good!"
+    else
+        print "Creating symbolic links:"
+        ln -siv $scriptfiles ${TGTDIR}
+    fi
+    d=( ${^path}(Ne:'[[ $REPLY -ef $TGTDIR ]]':) )
+    if [[ -z $d ]]; then
+        print -D "\nWARNING:" $TGTDIR "is not in the PATH."
+    fi
+    print
+}
+
+
 do_install() {
     print $HASHLINE
     print "Welcome to DiffPy-CMI ${VERSION?}"
@@ -372,61 +441,8 @@ do_install() {
         print "\n[dry run] - installation of symbolic links skipped."
         exit
     fi
-    local TGTDIR=$(print -lr \
-        'import site, distutils.sysconfig' \
-        'if site.ENABLE_USER_SITE:  print site.USER_SITE' \
-        'else:  print distutils.sysconfig.get_python_lib()' \
-        | ${PYTHON} )
-    print
-    print "Python path directory for installing ${PTHFILE:t}"
-    vared -p '--> ' TGTDIR
-    TGTDIR=${TGTDIR%%[[:space:]]##}
-    expand_tilde TGTDIR
-    if [[ -z $TGTDIR ]]; then
-        print "No directory, installation cancelled."
-        exit 1
-    fi
-    if [[ ! -d $TGTDIR ]]; then
-        print "Directory $TGTDIR does not exist."
-        if read -q '?Create? (y/n) '; then
-            mkdir -p ${TGTDIR} || exit $?
-            print
-        else
-            print "\nNo directory, installation cancelled."
-            exit 1
-        fi
-    fi
-    if [[ ${PTHFILE} -ef ${TGTDIR}/${PTHFILE:t} && -L ${TGTDIR}/${PTHFILE:t} ]];
-    then
-        print "Symbolic link to ${PTHFILE:t} already exists, good!"
-    else
-        print "Creating symbolic link"
-        ln -siv ${PTHFILE} ${TGTDIR} || exit $?
-    fi
-    TGTDIR=${HOME}/bin
-    d=$(print -rD -- $TGTDIR)
-    print "\nDirectory for installing executable scripts"
-    vared -p "--> " TGTDIR
-    TGTDIR=${TGTDIR%%[[:space:]]##}
-    expand_tilde TGTDIR
-    if [[ ! -d ${TGTDIR} ]]; then
-        print -D "Directory" $TGTDIR "does not exist, scripts not installed."
-    else
-        local f scriptfiles
-        scriptfiles=( ${BASEDIR}/bin/*(-*N) )
-        scriptfiles=( ${^scriptfiles}(Ne:'[[ ! $REPLY -ef $TGTDIR/${REPLY:t} ]]':) )
-        if [[ -z ${scriptfiles} ]]; then
-            print "Scripts are already installed, good."
-        else
-            print "Creating symbolic links:"
-            ln -siv $scriptfiles ${TGTDIR}
-        fi
-        d=( ${^path}(Ne:'[[ $REPLY -ef $TGTDIR ]]':) )
-        if [[ -z $d ]]; then
-            print -D "Warning:" $TGTDIR "is not in the PATH."
-        fi
-    fi
-    print
+    install_pthfile
+    install_scripts
     print $FINALINFO
 }
 
