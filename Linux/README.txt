@@ -44,10 +44,19 @@ Linux or Mac OS X with the following packages from system software manager:
         numpy scipy  python-matplotlib python-lxml python-ipython-notebook \
         scons git zsh
 
-(c) Mac OS X with Mac Ports:
+(c) Mac OS X with MacPorts (this may run for a while):
 
     sudo port install \
-        FIXME
+        python27 py27-setuptools py27-ipython py27-lxml \
+        gsl-devel boost py27-numpy py27-scipy py27-matplotib git-core
+
+    sudo port select --set ipython ipython27
+    sudo port select --set python python27
+
+    Important: When done, adjust the shell environment so that MacPorts Python
+    is the first in the PATH:
+
+    export PATH=/opt/local/bin:${PATH}
 
 
 INSTALLATION
