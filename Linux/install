@@ -163,6 +163,55 @@ python_easy_install() {
 }
 
 
+adjust_build_environment() {
+    # tie path variables to unique arrays of the lower-case name
+    typeset -TUx CPATH cpath
+    typeset -TUx CPLUS_INCLUDE_PATH cplus_include_path
+    typeset -TUx LIBRARY_PATH library_path
+    typeset -TUx LD_LIBRARY_PATH ld_library_path
+    typeset -TUx PYTHONPATH pythonpath
+    if [[ ${(L)OSTYPE} == darwin* ]]; then
+        adjust_macosx_environment
+    fi
+    BINDIR=${BASEDIR}/bin
+    INCLUDEDIR=${BASEDIR}/include
+    LIBDIR=${BASEDIR}/lib
+    PYTHON_VERSION=$($PYTHON -c \
+        'import sys; print "%s.%s" % sys.version_info[:2]')
+    PYTHONDIR=$LIBDIR/python${PYTHON_VERSION}/site-packages
+    : ${NCPU:=$(${PYTHON} -c \
+        'from multiprocessing import cpu_count; print max(4, cpu_count())')}
+    cpath=( $BASEDIR/include $cpath )
+    library_path=( ${BASEDIR}/lib $library_path )
+    ld_library_path=( ${BASEDIR}/lib $ld_library_path )
+    pythonpath=( $PYTHONDIR $pythonpath )
+}
+
+adjust_macosx_environment() {
+    local compilerpaths
+    compilerpaths=( ${(f)"$(${CXX:-c++} -E -x c++ - -v </dev/null 2>&1)"} )
+    compilerpaths=( ${(M)compilerpaths:#[ ]*} )
+    compilerpaths=( ${${compilerpaths##[[:blank:]]##}%%[[:blank:]]*} )
+    compilerpaths=( ${^compilerpaths}(N-/) )
+    local PORTDIR=${$(whence -p port):h:h}
+    local cxxhasboost
+    cxxhasboost=( ${^compilerpaths}/boost(N-/) )
+    if [[ -z $cxxhasboost && -d ${PORTDIR}/include/boost ]]; then
+        print "Warning: Adjusting CPATH to include MacPorts header files."
+        cpath=( $PORTDIR/include $cpath )
+        print -r "CPATH=${(q)CPATH}"
+        print
+        local plib=${PORTDIR}/lib
+        if [[ -d $plib && -z ${(M)library_path:#${plib}} ]]; then
+            print "Warning: Adjusting LIBRARY_PATH to include MacPorts libraries."
+            library_path=( $plib $library_path )
+            print -r "LIBRARY_PATH=${(q)LIBRARY_PATH}"
+            print
+        fi
+    fi
+}
+
+
 integer UIDX=0
 integer BIDX=0
 
@@ -231,24 +280,10 @@ do_update() {
 
 
 do_build() {
-    BINDIR=${BASEDIR}/bin
-    INCLUDEDIR=${BASEDIR}/include
-    LIBDIR=${BASEDIR}/lib
-    PYTHON_VERSION=$($PYTHON -c \
-        'import sys; print "%s.%s" % sys.version_info[:2]')
-    PYTHON_VERSION=$($PYTHON -c 'import sys; print "%s.%s" % sys.version_info[:2]')
-    PYTHONDIR=$LIBDIR/python${PYTHON_VERSION}/site-packages
-    : ${NCPU:=$(${PYTHON} -c \
-        'from multiprocessing import cpu_count; print max(4, cpu_count())')}
-
-    export PATH=${BASEDIR}/bin:$PATH
-    export LIBRARY_PATH=${BASEDIR}/lib:$LIBRARY_PATH
-    export LD_LIBRARY_PATH=${BASEDIR}/lib:$LD_LIBRARY_PATH
-    export CPATH=$BASEDIR/include:$CPATH
-    export PYTHONPATH=$PYTHONDIR:$PYTHONPATH
+    adjust_build_environment
 
     if [[ -z ${opt_dryrun} && -n ${build_selection} ]]; then
-        mkdir -p $BINDIR $INCLUDEDIR $LIBDIR $PYTHONDIR
+        mkdir -p ${BINDIR?} ${INCLUDEDIR?} ${LIBDIR?} ${PYTHONDIR?}
     fi
 
     ListSkipOrDo build "PyCifRW" || {
@@ -313,6 +348,7 @@ do_install() {
         if [[ -z $opt_dryrun ]]; then
             read -q '?Proceed? (y/n) '; print
         fi
+        print
         if [[ $REPLY != [yY] ]]; then
             print "Installation cancelled."
             exit 1
