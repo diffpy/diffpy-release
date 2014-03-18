@@ -35,14 +35,14 @@ Linux or Mac OS X with the following packages from system software manager:
     sudo apt-get install \
         libgsl0-dev libboost-all-dev python-dev python-setuptools \
         python-numpy python-scipy python-matplotlib python-lxml ipython \
-        scons git zsh
+        build-essential scons git zsh
         
 (b) Fedora Linux:
 
     sudo yum install \
         gsl-devel boost-devel python-devel python-setuptools \
         numpy scipy  python-matplotlib python-lxml python-ipython-notebook \
-        scons git zsh
+        gcc-c++ scons git zsh
 
 (c) Mac OS X with MacPorts (this may run for a while):
 
