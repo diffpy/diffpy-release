@@ -193,7 +193,7 @@ adjust_macosx_environment() {
     compilerpaths=( ${(M)compilerpaths:#[ ]*} )
     compilerpaths=( ${${compilerpaths##[[:blank:]]##}%%[[:blank:]]*} )
     compilerpaths=( ${^compilerpaths}(N-/) )
-    local PORTDIR=${$(whence -p port):h:h}
+    local PORTDIR=${$(whence -p port):h}
     local cxxhasboost
     cxxhasboost=( ${^compilerpaths}/boost(N-/) )
     if [[ -z $cxxhasboost && -d ${PORTDIR}/include/boost ]]; then
@@ -283,7 +283,16 @@ do_build() {
     adjust_build_environment
 
     if [[ -z ${opt_dryrun} && -n ${build_selection} ]]; then
-        mkdir -p ${BINDIR?} ${INCLUDEDIR?} ${LIBDIR?} ${PYTHONDIR?}
+        mkdir -p ${BINDIR?} ${INCLUDEDIR?} ${LIBDIR?} ${PYTHONDIR?} || exit $?
+        # x86_64 fedora wants to install to lib64 - in such case create symbolic
+        # link lib64 that points to lib
+        local binlibdest=$($PYTHON -c \
+            "import distutils.sysconfig; \
+            print distutils.sysconfig.get_config_var('BINLIBDEST')")
+        cd ${LIBDIR:h}
+        if [[ ${binlibdest:h:h:t} == lib64 && ! lib64 -ef ${LIBDIR:t} ]]; then
+            rm -f lib64 && ln -svf "${LIBDIR:t}" lib64 || exit $?
+        fi
     fi
 
     ListSkipOrDo build "PyCifRW" || {
