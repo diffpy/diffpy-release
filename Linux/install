@@ -362,7 +362,10 @@ install_pthfile() {
         print "Symbolic link to ${PTHFILE:t} already exists, good!"
     else
         print "Creating symbolic link"
-        ln -siv ${PTHFILE} ${TGTDIR} || exit $?
+        # On Linux "ln -si" gives zero exit status even if user declines to
+        # overwrite existing target.  Add test if symbolic link indeed works.
+        ln -siv ${PTHFILE} ${TGTDIR} &&
+            [[ ${PTHFILE} -ef ${TGTDIR}/${PTHFILE:t} ]] || exit $?
     fi
     print
 }
