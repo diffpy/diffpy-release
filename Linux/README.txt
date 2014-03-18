@@ -48,7 +48,7 @@ Linux or Mac OS X with the following packages from system software manager:
 
     sudo port install \
         python27 py27-setuptools py27-ipython py27-lxml \
-        gsl-devel boost py27-numpy py27-scipy py27-matplotlib git-core
+        gsl-devel boost py27-numpy py27-scipy py27-matplotlib scons git-core
 
     sudo port select --set ipython ipython27
     sudo port select --set python python27
