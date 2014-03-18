@@ -50,19 +50,19 @@ gitrepos=(
         master:9b5f351
     pyobjcryst
         https://github.com/diffpy/pyobjcryst.git
-        master:075dbe9
+        master
     cxxtest
         https://github.com/CxxTest/cxxtest.git
         master:4.3
     libdiffpy
         https://github.com/diffpy/libdiffpy.git
-        master:v1.2a0
+        master
     libobjcryst
         https://github.com/diffpy/libobjcryst.git
-        master:v1.9.8b
+        master:v1.9.8b-1
     diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
-        master:c4fd5c2
+        master
     diffpy.srfit
         https://github.com/diffpy/diffpy.srfit.git
         master:82b26db
