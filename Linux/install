@@ -195,7 +195,7 @@ adjust_macosx_environment() {
     compilerpaths=( ${(M)compilerpaths:#[ ]*} )
     compilerpaths=( ${${compilerpaths##[[:blank:]]##}%%[[:blank:]]*} )
     compilerpaths=( ${^compilerpaths}(N-/) )
-    local PORTDIR=${$(whence -p port):h}
+    local PORTDIR=${$(whence -p port):h:h}
     local cxxhasboost
     cxxhasboost=( ${^compilerpaths}/boost(N-/) )
     if [[ -z $cxxhasboost && -d ${PORTDIR}/include/boost ]]; then
