@@ -39,6 +39,9 @@ if test -z "$ZSH_VERSION"; then
         echo
         exit 2
     fi
+    # Mac OS X 10.7 (Lion) is misconfigured to reset PATH for "zsh -f"
+    # Save the original value so it can be restored in zsh.
+    export PATH_NwldpJ="$PATH"
     exec $ZSH -f "$0" "$@"
 fi
 
@@ -47,6 +50,12 @@ fi
 emulate zsh
 umask 022
 setopt extendedglob
+
+# restore the saved PATH and remove any duplicate entries.
+PATH="${PATH_NwldpJ}:${PATH}"
+# remove blank and duplicate entries from the PATH
+typeset -U path
+path=( $path )
 
 # Constants ------------------------------------------------------------------
 
