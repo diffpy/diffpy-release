@@ -416,6 +416,7 @@ ListSkipOrBuild "create diffpy_cmi tarball" || {
     rsync -av --delete --link-dest=$BASEDIR \
         --exclude=$PACKAGE --exclude=${^excludes} \
         ${sourcepaths?} $PACKAGE/
+    chmod -R go-w $PACKAGE
     # finally create the tar bundle
     $TAR czf ${PACKAGE}.tar.gz \
         --directory ${PACKAGE:h} \
