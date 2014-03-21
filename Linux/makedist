@@ -44,28 +44,28 @@ PKGNAME=diffpy_cmi
 gitrepos=(
     diffpy.Structure
         https://github.com/diffpy/diffpy.Structure.git
-        master:2a4d253
+        master:v1.2
     diffpy.utils
         https://github.com/diffpy/diffpy.utils.git
-        master:9b5f351
+        master:v1.1
     pyobjcryst
         https://github.com/diffpy/pyobjcryst.git
-        master:22ffb5f
+        master:v1.0
     cxxtest
         https://github.com/CxxTest/cxxtest.git
         master:4.3
     libdiffpy
         https://github.com/diffpy/libdiffpy.git
-        master:587d411
+        master:v1.2
     libobjcryst
         https://github.com/diffpy/libobjcryst.git
-        master:v1.9.8b-1
+        master:v1.9.8
     diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
-        master:6f125d4
+        master:v1.0
     diffpy.srfit
         https://github.com/diffpy/diffpy.srfit.git
-        master:82b26db
+        master:v1.0
 )
 
 # Mercurial repositories for the sources in order of
