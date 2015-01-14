@@ -191,7 +191,7 @@ adjust_build_environment() {
         'import sys; print "%s.%s" % sys.version_info[:2]')
     PYTHONDIR=$LIBDIR/python${PYTHON_VERSION}/site-packages
     : ${NCPU:=$(${PYTHON} -c \
-        'from multiprocessing import cpu_count; print max(4, cpu_count())')}
+        'from multiprocessing import cpu_count; print min(4, cpu_count())')}
     cpath=( $BASEDIR/include $cpath )
     library_path=( ${BASEDIR}/lib $library_path )
     ld_library_path=( ${BASEDIR}/lib $ld_library_path )
