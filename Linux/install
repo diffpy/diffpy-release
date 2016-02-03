@@ -339,15 +339,9 @@ do_build() {
     ListSkipOrDo build "diffpy.srfit" || {
         python_easy_install -ZN --prefix=$BASEDIR ${SRCDIR}/diffpy.srfit
     } || return $?
-    ListSkipOrDo build "sans packages" || {
-        cd ${SRCDIR}/sans/data_util &&
-        ${PYTHON} setup.py install --prefix=$BASEDIR &&
-        cd ${SRCDIR}/sans/sansdataloader &&
-        ${PYTHON} setup.py install --prefix=$BASEDIR &&
-        cd ${SRCDIR}/sans/sansmodels &&
-        ${PYTHON} setup.py install --prefix=$BASEDIR &&
-        cd ${SRCDIR}/sans/pr_inversion &&
-        ${PYTHON} setup.py install --prefix=$BASEDIR
+    ListSkipOrDo build "srfit-sasview" || {
+        python_easy_install -ZN --prefix=$BASEDIR --exclude-scripts \
+            ${SRCDIR}/srfit-sasview
     } || return $?
 }
 
