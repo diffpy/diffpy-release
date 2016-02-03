@@ -36,7 +36,7 @@ Linux or Mac OS X with the following packages from system software manager:
         libgsl0-dev libboost-all-dev python-dev python-setuptools \
         python-numpy python-scipy python-matplotlib python-lxml ipython \
         build-essential scons git zsh
-        
+
 (b) Fedora Linux:
 
     sudo yum install \
