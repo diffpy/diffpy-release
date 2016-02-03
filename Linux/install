@@ -229,6 +229,7 @@ integer BIDX=0
 ListSkipOrDo() {
     local selection
     local idx
+    typeset -gA didheader
     case $1 in
         (build)
             idx=$(( ++BIDX ))
@@ -247,7 +248,6 @@ ListSkipOrDo() {
         return 0
     fi
     if [[ -n ${opt_dryrun} ]]; then
-        typeset -gA didheader
         if [[ -z ${didheader[$1]} ]]; then
             didheader[$1]=1
             print "\n[dry run] - ignored $1 steps:"
@@ -256,6 +256,8 @@ ListSkipOrDo() {
         return 0
     fi
     local sepline="# $idx $name ${(l:80::-:):-}"
+    [[ -z ${didheader[$1]} ]] || print
+    didheader[$1]=1
     print ${sepline[1,78]}
     # return false status to trigger the build section
     return 1
@@ -263,29 +265,45 @@ ListSkipOrDo() {
 
 
 do_update() {
-    ListSkipOrDo update "src/libobjcryst" || (
-        cd $SRCDIR/libobjcryst &&
-        git fetch origin --tags &&
-        versiontags=( ${(f)"$(git tag --list 'v[[:digit:]]*')"} ) &&
-        git checkout ${versiontags[-1]}
-    ) || return $?
-    ListSkipOrDo update "src/libdiffpy" || {
-        cd $SRCDIR/libdiffpy && git pull origin
+    local PS4=">> "
+    local msg_noupdate
+    MSG_NOUPDATE="Update of this package is not supported.  Skipped."
+    ListSkipOrDo update "src/pycifrw (N/A)" || {
+        print $MSG_NOUPDATE
     } || return $?
-    ListSkipOrDo update "src/diffpy.Structure" || {
+    ListSkipOrDo update "src/diffpy.Structure" || (
+        setopt xtrace
         cd $SRCDIR/diffpy.Structure && git pull origin
-    } || return $?
-    ListSkipOrDo update "src/diffpy.utils" || {
+    ) || return $?
+    ListSkipOrDo update "src/diffpy.utils" || (
+        setopt xtrace
         cd $SRCDIR/diffpy.utils && git pull origin
+    ) || return $?
+    ListSkipOrDo update "src/periodictable (N/A)" || {
+        print $MSG_NOUPDATE
     } || return $?
-    ListSkipOrDo update "src/pyobjcryst" || {
+    ListSkipOrDo update "src/libobjcryst" || (
+        setopt xtrace
+        cd $SRCDIR/libobjcryst && git pull origin
+    ) || return $?
+    ListSkipOrDo update "src/pyobjcryst" || (
+        setopt xtrace
         cd $SRCDIR/pyobjcryst && git pull origin
-    } || return $?
-    ListSkipOrDo update "src/diffpy.srreal" || {
+    ) || return $?
+    ListSkipOrDo update "src/libdiffpy" || (
+        setopt xtrace
+        cd $SRCDIR/libdiffpy && git pull origin
+    ) || return $?
+    ListSkipOrDo update "src/diffpy.srreal" || (
+        setopt xtrace
         cd $SRCDIR/diffpy.srreal && git pull origin
-    } || return $?
-    ListSkipOrDo update "src/diffpy.srfit" || {
+    ) || return $?
+    ListSkipOrDo update "src/diffpy.srfit" || (
+        setopt xtrace
         cd $SRCDIR/diffpy.srfit && git pull origin
+    ) || return $?
+    ListSkipOrDo update "src/srfit-sasview (N/A)" || {
+        print $MSG_NOUPDATE
     } || return $?
 }
 
