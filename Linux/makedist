@@ -44,28 +44,28 @@ PKGNAME=diffpy_cmi
 gitrepos=(
     diffpy.Structure
         https://github.com/diffpy/diffpy.Structure.git
-        master:v1.2
+        master:v1.3.1
     diffpy.utils
         https://github.com/diffpy/diffpy.utils.git
-        master:v1.1
+        master:v1.2.1
     pyobjcryst
         https://github.com/diffpy/pyobjcryst.git
-        master:v1.0
-    cxxtest
-        https://github.com/CxxTest/cxxtest.git
-        master:4.3
+        master:v2.0.1
     libdiffpy
         https://github.com/diffpy/libdiffpy.git
-        master:v1.2
+        master:v1.3.1
     libobjcryst
         https://github.com/diffpy/libobjcryst.git
-        master:v1.9.8
+        master:v2015.1.1
     diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
-        master:v1.0
+        master:v1.1
     diffpy.srfit
         https://github.com/diffpy/diffpy.srfit.git
-        master:v1.0
+        master:v1.1
+    srfit-sasview
+        https://github.com/pavoljuhas/sasview.git
+        srfit-sasview:f5f721d1b1c4afcb4e4fbd9a1e13beff75c05881
 )
 
 # Mercurial repositories for the sources in order of
@@ -75,22 +75,16 @@ hgrepos=(
 
 # URLs to source code bundles as (directory, URL)
 tarballs=(
+    cxxtest
+        https://github.com/CxxTest/cxxtest/releases/download/4.4/cxxtest-4.4.tar.gz
     pycifrw
-        https://bitbucket.org/jamesrhester/pycifrw/downloads/PyCifRW-3.6.1.tar.gz
+        https://pypi.python.org/packages/source/P/PyCifRW/PyCifRW-4.1.1.tar.gz
     periodictable
         https://pypi.python.org/packages/source/p/periodictable/periodictable-1.4.1.tar.gz
 )
 
 # Subversion repositories as (targetpath, URL)
 svnrepos=(
-    sans/data_util
-        svn://svn@danse.us/common/releases/util-1.0.0@1501
-    sans/sansdataloader
-        svn://svn@danse.us/sans/releases/sansdataloader-1.0.0@5489
-    sans/sansmodels
-        svn://svn@danse.us/sans/releases/sansmodels-1.0.0@5489
-    sans/pr_inversion
-        svn://svn@danse.us/sans/releases/pr_inversion-1.0.0@5489
 )
 
 # Parse command-line options -------------------------------------------------
@@ -353,24 +347,9 @@ ListSkipOrBuild diffpy.srreal binary || {
     $SCONS -j $NCPU build=fast prefix=$PREFIX install
 }
 
-ListSkipOrBuild sans/data_util binary || {
-    cd ${SRCDIR}/sans/data_util
-    ${PYTHON} setup.py install --prefix=$PREFIX
-}
-
-ListSkipOrBuild sans/sansdataloader binary || {
-    cd ${SRCDIR}/sans/sansdataloader
-    ${PYTHON} setup.py install --prefix=$PREFIX
-}
-
-ListSkipOrBuild sans/sansmodels binary || {
-    cd ${SRCDIR}/sans/sansmodels
-    ${PYTHON} setup.py install --prefix=$PREFIX
-}
-
-ListSkipOrBuild sans/pr_inversion binary || {
-    cd ${SRCDIR}/sans/pr_inversion
-    ${PYTHON} setup.py install --prefix=$PREFIX
+ListSkipOrBuild srfit-sasview binary || {
+    python_easy_install -N --prefix=$PREFIX --exclude-scripts \
+        ${SRCDIR}/srfit-sasview
 }
 
 ListSkipOrBuild diffpy.srfit binary || {
@@ -406,6 +385,8 @@ ListSkipOrBuild "create diffpy_cmi tarball" || {
         .svn
         # Use cxxtest at a fixed git-tag version
         src/cxxtest/.git
+        # Use srfit-sasview at a fixed git-tag version
+        src/srfit-sasview/.git
     )
     sourcepaths=(
         install src *.pth *.sh *.txt
