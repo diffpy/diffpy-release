@@ -3,6 +3,9 @@
 Import('env')
 
 # Set RPATH to find the libObjCryst.so in the parent lib directory.
-env.AppendUnique(LINKFLAGS="-Wl,-rpath,'$$ORIGIN/../../../..'")
+rpath_quoted = "'$$ORIGIN/../../../..'"
+if env['PLATFORM'] == 'darwin':
+    rpath_quoted = rpath_quoted.replace('$$ORIGIN', '@loader_path')
+env.Prepend(LINKFLAGS="-Wl,-rpath," + rpath_quoted)
 
 # vim: ft=python

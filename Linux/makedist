@@ -56,7 +56,7 @@ gitrepos=(
         master:v1.3.1
     libobjcryst
         https://github.com/diffpy/libobjcryst.git
-        master:v2015.1.1
+        master:5d0cdbca8c6c9fa86ddd7d82e51999456c36be2b
     diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
         master:v1.1

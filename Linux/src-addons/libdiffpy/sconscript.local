@@ -5,7 +5,13 @@ Import('env')
 
 # Set RPATH to make the libdiffpy shared library search its
 # own directory for other required shared libraries.
-env.AppendUnique(LINKFLAGS="-Wl,-rpath,'$$ORIGIN'")
+rpath_quoted = "'$$ORIGIN'"
+if env['PLATFORM'] == 'darwin':
+    rpath_quoted = rpath_quoted.replace('$$ORIGIN', '@loader_path')
+env.Prepend(LINKFLAGS="-Wl,-rpath," + rpath_quoted)
+
+if env['PLATFORM'] == 'darwin':
+    env.Replace(DARWIN_INSTALL_NAME='@rpath/$TARGET.file')
 
 # determine installation path of the cxxtest framework
 env['CXXTEST_INSTALL_DIR'] = os.path.abspath(

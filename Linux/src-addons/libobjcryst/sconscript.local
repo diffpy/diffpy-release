@@ -1,0 +1,8 @@
+# Local tweaks to the scons build environment.
+
+Import('env')
+
+if env['PLATFORM'] == 'darwin':
+    env.Replace(DARWIN_INSTALL_NAME='@rpath/$TARGET.file')
+
+# vim: ft=python
