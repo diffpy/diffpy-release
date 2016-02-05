@@ -205,6 +205,7 @@ fetchgitrepository() {
         fi
         )
     fi
+    ( cd $tgtdir && git gc --prune=all )
 }
 
 
