@@ -44,7 +44,7 @@ PKGNAME=diffpy_cmi
 gitrepos=(
     diffpy.Structure
         https://github.com/diffpy/diffpy.Structure.git
-        master:v1.3.1
+        master:v1.3.2
     diffpy.utils
         https://github.com/diffpy/diffpy.utils.git
         master:v1.2.1
@@ -56,7 +56,7 @@ gitrepos=(
         master:v1.3.1
     libobjcryst
         https://github.com/diffpy/libobjcryst.git
-        master:5d0cdbca8c6c9fa86ddd7d82e51999456c36be2b
+        master:v2015.1.2
     diffpy.srreal
         https://github.com/diffpy/diffpy.srreal.git
         master:v1.1
