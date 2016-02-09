@@ -63,9 +63,6 @@ gitrepos=(
     diffpy.srfit
         https://github.com/diffpy/diffpy.srfit.git
         master:v1.1
-    srfit-sasview
-        https://github.com/pavoljuhas/sasview.git
-        srfit-sasview:f5f721d1b1c4afcb4e4fbd9a1e13beff75c05881
 )
 
 # Mercurial repositories for the sources in order of
@@ -81,6 +78,8 @@ tarballs=(
         https://pypi.python.org/packages/source/P/PyCifRW/PyCifRW-4.1.1.tar.gz
     periodictable
         https://pypi.python.org/packages/source/p/periodictable/periodictable-1.4.1.tar.gz
+    srfit-sasview
+        https://github.com/diffpy/srfit-sasview/releases/download/sfsv3.1.2/srfit-sasview-3.1.2.tar.gz
 )
 
 # Subversion repositories as (targetpath, URL)
@@ -349,8 +348,8 @@ ListSkipOrBuild diffpy.srreal binary || {
 }
 
 ListSkipOrBuild srfit-sasview binary || {
-    python_easy_install -N --prefix=$PREFIX --exclude-scripts \
-        ${SRCDIR}/srfit-sasview
+    python_easy_install -ZN --prefix=$PREFIX --exclude-scripts \
+        ${SRCDIR}/srfit-sasview/srfit-sasview-*.tar.gz(om[1])
 }
 
 ListSkipOrBuild diffpy.srfit binary || {

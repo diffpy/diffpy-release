@@ -322,10 +322,8 @@ do_clean() {
         cd $SRCDIR/diffpy.srfit &&
             rm -rf build temp diffpy.srreal.egg-info
     ) || return $?
-    ListSkipOrDo clean "src/srfit-sasview" || {
-        setopt xtrace
-        cd $SRCDIR/srfit-sasview &&
-            rm -rf build temp srfit_sasview.egg-info
+    ListSkipOrDo clean "src/srfit-sasview (N/A)" || {
+        print $MSG_NOCLEAN
     } || return $?
 }
 
@@ -425,7 +423,7 @@ do_build() {
     } || return $?
     ListSkipOrDo build "srfit-sasview" || {
         python_easy_install -ZN --prefix=$BASEDIR --exclude-scripts \
-            ${SRCDIR}/srfit-sasview
+            ${SRCDIR}/srfit-sasview/srfit-sasview-*.tar.gz(om[1])
     } || return $?
 }
 
